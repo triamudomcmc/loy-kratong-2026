@@ -11,6 +11,7 @@ export function useWindowDimensions() {
   const [windowDimensions, setWindowDimensions] = useState({ width: 0, height: 0 });
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- measured after mount to stay SSR-safe
     setWindowDimensions(getWindowDimensions());
 
     function handleResize() {

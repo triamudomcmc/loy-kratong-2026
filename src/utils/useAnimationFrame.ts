@@ -6,8 +6,8 @@ type StopCallback = (delta: number) => boolean;
 export const useAnimationFrame = (callback: AnimationFrameCallback, shouldStop: StopCallback, shouldStart: boolean = true) => {
   // Use useRef for mutable variables that we want to persist
   // without triggering a re-render on their change
-  const requestRef = useRef<undefined | number>();
-  const previousTimeRef = useRef<undefined | number>();
+  const requestRef = useRef<number | undefined>(undefined);
+  const previousTimeRef = useRef<number | undefined>(undefined);
 
   const animate = (time: number) => {
     if (previousTimeRef.current !== undefined) {
@@ -28,6 +28,7 @@ export const useAnimationFrame = (callback: AnimationFrameCallback, shouldStop: 
     }
   }, [shouldStart]); // Make sure the effect runs only once
 
+  // eslint-disable-next-line react-hooks/refs -- legacy API, returns the latest frame id
   return requestRef.current;
 };
 

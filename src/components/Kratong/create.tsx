@@ -10,13 +10,8 @@ import { pushKratongContext } from "../../bridges/build/init";
 import { CatLoading } from "@components/Loading";
 import { useRouter } from "next/router";
 
-export interface Selected {
-  base: string;
-  flowers: string;
-  candles: string;
-  decorations: string;
-  signVariant: number;
-}
+import type { KratongSelected as Selected, Wish } from "@types-app/kratong";
+export type { Selected, Wish };
 
 interface CreateKratongProps {
   selected: Selected;
@@ -258,10 +253,6 @@ const CreateKratong: NextPage<CreateKratongProps> = ({ selected, setSelected, ne
   );
 };
 
-export interface Wish {
-  name: string;
-  content: string;
-}
 
 interface CreateWishProps {
   selected: Selected;
@@ -457,10 +448,8 @@ const CreateWish: NextPage<CreateWishProps> = ({ selected, wish, setWish, nextPa
   );
 };
 
-export interface ResultData {
-  kratong: Selected;
-  wish: Wish;
-}
+import type { ResultData as ResultData } from "@types-app/kratong";
+export type { ResultData };
 
 // interface ResultProps {
 //   data: ResultData;
@@ -510,10 +499,8 @@ export interface ResultData {
 //   );
 // };
 
-export interface KratongData {
-  kratong: Selected;
-  wish: Wish;
-}
+import type { ResultData as KratongData } from "@types-app/kratong";
+export type { KratongData };
 
 export const Create: NextPage<{ idata: KratongData }> = ({ idata }) => {
   const [data, setData] = useState<KratongData>(

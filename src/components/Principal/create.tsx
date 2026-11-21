@@ -9,12 +9,8 @@ import { useRouter } from "next/router";
 import { sendDataContext } from "@handlers/init";
 import { motion } from "framer-motion";
 
-export interface Selected {
-  base: string;
-  swan: string;
-  candles: string;
-  decorations: string;
-}
+import type { PrincipalSelected as Selected, Wish } from "@types-app/kratong";
+export type { Selected, Wish };
 
 interface CreateKratongProps {
   selected: Selected;
@@ -163,10 +159,6 @@ const CreateKratong: NextPage<CreateKratongProps> = ({ selected, setSelected, ne
   );
 };
 
-export interface Wish {
-  name: string;
-  content: string;
-}
 
 interface CreateWishProps {
   selected: Selected;
@@ -320,10 +312,8 @@ const CreateWish: NextPage<CreateWishProps> = ({ selected, wish, setWish, nextPa
   );
 };
 
-export interface ResultData {
-  kratong: Selected;
-  wish: Wish;
-}
+import type { PrincipalResultData as ResultData } from "@types-app/kratong";
+export type { ResultData };
 
 interface ResultProps {
   data: ResultData;
@@ -390,10 +380,8 @@ const Result: NextPage<ResultProps> = ({ data, prevPage }) => {
   );
 };
 
-export interface KratongData {
-  kratong: Selected;
-  wish: Wish;
-}
+import type { PrincipalResultData as KratongData } from "@types-app/kratong";
+export type { KratongData };
 
 export const Create: NextPage<{ idata: KratongData }> = ({ idata }) => {
   const [data, setData] = useState<KratongData>(

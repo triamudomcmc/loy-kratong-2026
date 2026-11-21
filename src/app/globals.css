@@ -1,0 +1,66 @@
+@import "tailwindcss";
+
+/*
+ * Replaces Tailwind's default fonts and breakpoints the same way the v2 config did
+ * (theme.fontFamily / theme.screens were set outside `extend`).
+ * The font variables are provided by next/font in app/layout.tsx.
+ */
+@theme {
+  --font-*: initial;
+  --font-display: var(--font-chula-narak), "ChulaNarak", serif;
+  --font-ui: var(--font-plex-sans-thai), "IBM Plex Sans Thai", sans-serif;
+  --font-title: var(--font-maitree), "Maitree", serif;
+
+  --breakpoint-*: initial;
+  --breakpoint-custom: 460px;
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-nak: 530px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1536px;
+}
+
+@utility blinking-text {
+  @apply animate-pulse;
+}
+
+@utility bg-loy {
+  background: linear-gradient(180deg, #000000 0%, #236bad 70.87%);
+}
+
+@layer base {
+  /* Tailwind v4 no longer sets cursor: pointer on buttons */
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+
+  body {
+    padding: 0;
+    margin: 0;
+  }
+}
+
+/* width */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  border-radius: 100vh;
+  background: rgba(0, 0, 0, 0);
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #edf2f7;
+  border-radius: 100vh;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #cbd5e0;
+}
