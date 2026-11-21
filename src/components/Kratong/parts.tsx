@@ -1,7 +1,4 @@
-import type { NextPage } from "next";
 import { KratongNormalPartType, KratongVariantPartType } from "@map/kratong";
-import styles from "@styles/modules/Kratong.module.scss";
-import classNames from "classnames";
 
 interface KratongNormalPartProps {
   part: KratongNormalPartType;
@@ -14,45 +11,44 @@ interface KratongVariantPartProps {
   signVariant: number;
 }
 
-export const NormalPart: NextPage<KratongNormalPartProps> = ({ part, selected }) => {
+export function NormalPart({ part, selected }: KratongNormalPartProps) {
   return (
     <div
-      className={classNames(styles["container"], "select-none")}
+      className="select-none"
       style={{ display: selected === part.id ? "inline-block" : "none" }}
     >
-      <img draggable={false} className={classNames(styles["img"], "select-none")} src={part.url} alt={part.name} />
+      <img draggable={false} className="select-none" src={part.url} alt={part.name} />
     </div>
   );
-};
+}
 
-export const Candle: NextPage<KratongNormalPartProps> = ({ part, selected }) => {
+export function Candle({ part, selected }: KratongNormalPartProps) {
   return (
     <div
-      className={classNames(styles["container"], "select-none")}
+      className="select-none"
       style={{ display: selected === part.id ? "inline-block" : "none" }}
     >
-      <img draggable={false} className={classNames(styles["img"], "select-none")} src={part.url} alt={part.name} />
+      <img draggable={false} className="select-none" src={part.url} alt={part.name} />
     </div>
   );
-};
+}
 
-export const VariantPart: NextPage<KratongVariantPartProps> = ({ part, selected, signVariant }) => {
+export function VariantPart({ part, selected, signVariant }: KratongVariantPartProps) {
   return (
     <>
       {part.variants.map((variant: string, variantIdx) => {
         return (
           <div
             key={variantIdx}
-            className={styles["container"]}
-            style={{ display: selected === part.id && variantIdx === signVariant ? "inline-block" : "none" }}
+                        style={{ display: selected === part.id && variantIdx === signVariant ? "inline-block" : "none" }}
           >
-            <img draggable={false} className={classNames(styles["img"], "select-none")} src={variant} alt={part.name} />
+            <img draggable={false} className="select-none" src={variant} alt={part.name} />
           </div>
         );
       })}
     </>
   );
-};
+}
 
 /*
 {Object.keys(KratongMap.base).map((base: string) => {

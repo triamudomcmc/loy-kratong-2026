@@ -1,9 +1,8 @@
-import type { NextPage } from "next";
 import { KratongMap } from "@map/kratong";
-import styles from "@styles/modules/Kratong.module.scss";
+import { kratongCls } from "@components/kratong-classes";
 import { NormalPart, VariantPart, Candle } from "./parts";
 import { Selected } from "./create";
-import classNames from "classnames";
+import clsx from "clsx";
 
 interface KratongProps {
   selected: Selected;
@@ -17,17 +16,17 @@ height: 240px
 offset: 60px
 */
 
-export const Kratong: NextPage<KratongProps> = ({ selected, height, zIndex, className }) => {
+export function Kratong({ selected, height, zIndex, className }: KratongProps) {
   return (
     <>
       <div
         style={{ ["--size" as string]: height, ["--z-index" as string]: zIndex }}
-        className={classNames(styles["kratong"], className)}
+        className={clsx(kratongCls.root, className)}
       >
-        <div className={styles["topping"]}>
-          <div className={styles["decorations"]}>
+        <div className={kratongCls.topping}>
+          <div className={kratongCls.decorations}>
             {Object.keys(KratongMap.decorations).map((decoration: string) => {
-              // @ts-ignore
+              // @ts-expect-error map is indexed by string key
               const part = KratongMap.decorations[decoration];
               if (part.type === "normal")
                 return <NormalPart key={decoration} part={part} selected={selected.decorations} />;
@@ -42,18 +41,18 @@ export const Kratong: NextPage<KratongProps> = ({ selected, height, zIndex, clas
                 );
             })}
           </div>
-          <div className={styles["candle"]}>
+          <div className={kratongCls.candle}>
             {Object.keys(KratongMap.candles).map((candle: string) => {
-              // @ts-ignore
+              // @ts-expect-error map is indexed by string key
               const part = KratongMap.candles[candle];
               return <Candle key={candle} part={part} selected={selected.candles} />;
             })}
           </div>
         </div>
-        <div className={styles["base"]}>
-          <div className={styles["flowers"]}>
+        <div className={kratongCls.base}>
+          <div className={kratongCls.flowers}>
             {Object.keys(KratongMap.flowers).map((flower: string) => {
-              // @ts-ignore
+              // @ts-expect-error map is indexed by string key
               const part = KratongMap.flowers[flower];
               if (part.type === "normal") return <NormalPart key={flower} part={part} selected={selected.flowers} />;
               else if (part.type === "variant")
@@ -67,13 +66,12 @@ export const Kratong: NextPage<KratongProps> = ({ selected, height, zIndex, clas
                 );
             })}
           </div>
-          <div className={styles["shell"]}>
+          <div className={kratongCls.shell}>
             {Object.keys(KratongMap.base).map((base: string) => {
-              // @ts-ignore
+              // @ts-expect-error map is indexed by string key
               const part = KratongMap.base[base];
               if (part.type === "normal") {
-                // @ts-ignore
-                return <NormalPart key={base} part={KratongMap.base[base]} selected={selected.base} />;
+                return <NormalPart key={base} part={part} selected={selected.base} />;
               } else if (part.type === "variant")
                 return (
                   <VariantPart key={base} part={part} selected={selected.base} signVariant={selected.signVariant} />
@@ -84,4 +82,4 @@ export const Kratong: NextPage<KratongProps> = ({ selected, height, zIndex, clas
       </div>
     </>
   );
-};
+}

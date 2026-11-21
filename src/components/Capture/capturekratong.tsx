@@ -1,10 +1,10 @@
+"use client";
+
 import { KratongData, KratongData as NKratongData, Selected as NSelected, Wish } from "@components/Kratong/create";
-import type { NextPage } from "next";
 import { CUPSAAMap, KratongMap, PrincipalMap } from "@map/kratong";
-import styles from "@styles/modules/Kratong.module.scss";
+import { kratongCls } from "@components/kratong-classes";
 import { Candle, NormalPart, VariantPart } from "@components/Kratong/parts";
-import classNames from "classnames";
-import { AnimatePresence, motion } from "framer-motion";
+import clsx from "clsx";
 import { FC, useEffect, useMemo, useState } from "react";
 import { useWindowDimensions } from "@utils/useWindowDimensions";
 import { WaterFourData } from "@map/animations";
@@ -30,13 +30,13 @@ const DisplayKratong: FC<KratongProps> = ({ data, height, zIndex, onClick, highl
         onMouseLeave={() => setHovered(false)}
         onClick={() => onClick()}
         style={{ ["--size" as string]: height, ["--z-index" as string]: zIndex }}
-        className={classNames(styles["kratong"], "cursor-pointer")}
+        className={clsx(kratongCls.root, "cursor-pointer")}
       >
-        {highlighted && <div className={classNames(styles["caura"])}></div>}
-        <div className={styles["topping"]}>
-          <div className={styles["decorations"]}>
+        {highlighted && <div className={kratongCls.caura}></div>}
+        <div className={kratongCls.topping}>
+          <div className={kratongCls.decorations}>
             {Object.keys(KratongMap.decorations).map((decoration: string) => {
-              // @ts-ignore
+              // @ts-expect-error map is indexed by string key
               const part = KratongMap.decorations[decoration];
               if (part.type === "normal")
                 return <NormalPart key={decoration} part={part} selected={selected.decorations} />;
@@ -51,18 +51,18 @@ const DisplayKratong: FC<KratongProps> = ({ data, height, zIndex, onClick, highl
                 );
             })}
           </div>
-          <div className={styles["candle"]}>
+          <div className={kratongCls.candle}>
             {Object.keys(KratongMap.candles).map((candle: string) => {
-              // @ts-ignore
+              // @ts-expect-error map is indexed by string key
               const part = KratongMap.candles[candle];
               return <Candle key={candle} part={part} selected={selected.candles} />;
             })}
           </div>
         </div>
-        <div className={styles["base"]}>
-          <div className={styles["flowers"]}>
+        <div className={kratongCls.base}>
+          <div className={kratongCls.flowers}>
             {Object.keys(KratongMap.flowers).map((flower: string) => {
-              // @ts-ignore
+              // @ts-expect-error map is indexed by string key
               const part = KratongMap.flowers[flower];
               if (part.type === "normal") return <NormalPart key={flower} part={part} selected={selected.flowers} />;
               else if (part.type === "variant")
@@ -76,13 +76,12 @@ const DisplayKratong: FC<KratongProps> = ({ data, height, zIndex, onClick, highl
                 );
             })}
           </div>
-          <div className={styles["shell"]}>
+          <div className={kratongCls.shell}>
             {Object.keys(KratongMap.base).map((base: string) => {
-              // @ts-ignore
+              // @ts-expect-error map is indexed by string key
               const part = KratongMap.base[base];
               if (part.type === "normal") {
-                // @ts-ignore
-                return <NormalPart key={base} part={KratongMap.base[base]} selected={selected.base} />;
+                return <NormalPart key={base} part={part} selected={selected.base} />;
               } else if (part.type === "variant")
                 return (
                   <VariantPart key={base} part={part} selected={selected.base} signVariant={selected.signVariant} />
@@ -93,9 +92,9 @@ const DisplayKratong: FC<KratongProps> = ({ data, height, zIndex, onClick, highl
       </div>
     </>
   );
-};
+}
 
-export const IdleCaptureKratong: NextPage<{
+export function IdleCaptureKratong({ className, data, size, lane, initialX, highlighted, initialY }: {
   data: NKratongData;
   className?: string;
   size: string;
@@ -103,7 +102,7 @@ export const IdleCaptureKratong: NextPage<{
   initialX: number;
   initialY: number;
   highlighted: boolean;
-}> = ({ className, data, size, lane, initialX, highlighted, initialY }) => {
+}) {
   const { width, height } = useWindowDimensions();
   const [toggle, setToggle] = useState(false);
 
@@ -128,4 +127,4 @@ export const IdleCaptureKratong: NextPage<{
       </div>
     </>
   );
-};
+}
