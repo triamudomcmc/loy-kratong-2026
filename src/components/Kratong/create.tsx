@@ -1,14 +1,15 @@
-import type { NextPage } from "next";
+"use client";
+
+import type { FC } from "react";
 import { Fragment, useState } from "react";
 import { Kratong } from "./kratong";
 import { KratongMap, KratongType, KratongTypeVariant } from "@map/kratong";
 import Image from "next/image";
-import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/solid";
-import classnames from "classnames";
-import { motion } from "framer-motion";
-import { pushKratongContext } from "../../bridges/build/init";
-import { CatLoading } from "@components/Loading";
-import { useRouter } from "next/router";
+import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
+import clsx from "clsx";
+import { motion } from "motion/react";
+import { pushKratong } from "@server/actions";
+import { useRouter } from "next/navigation";
 
 import type { KratongSelected as Selected, Wish } from "@types-app/kratong";
 export type { Selected, Wish };
@@ -26,8 +27,7 @@ interface KratongTileProps {
   data: KratongType | KratongTypeVariant;
 }
 
-const KratongTile: NextPage<KratongTileProps> = ({ part, setSelected, selected, data }) => {
-  // @ts-ignore
+const KratongTile: FC<KratongTileProps> = ({ part, setSelected, selected, data }) => {
   return (
     <>
       <motion.div
@@ -40,14 +40,14 @@ const KratongTile: NextPage<KratongTileProps> = ({ part, setSelected, selected, 
         onClick={() => {
           setSelected({ ...selected, [part]: data.id });
         }}
-        className={classnames(
-          "border-2 rounded-[20%] cursor-pointer bg-[#F5F5FB] transition-opacity bg-opacity-40 hover:bg-opacity-60",
+        className={clsx(
+          "border-2 rounded-[20%] cursor-pointer bg-[#F5F5FB] transition-opacity bg-[#F5F5FB]/40 hover:bg-[#F5F5FB]/60",
           selected[part] === data.id ? "border-white" : "border-transparent"
         )}
       >
         <div className="flex flex-col items-center mt-[-4px] mx-[-6px]">
           <Image
-            objectFit="contain"
+            className="object-contain"
             alt={data["name"]}
             priority={true}
             width={2388}
@@ -69,55 +69,24 @@ const KratongTile: NextPage<KratongTileProps> = ({ part, setSelected, selected, 
 
 const signColors = ["#c93139", "#ffa654", "#f38de5", "#ff97b2", "#5076e7", "#53f028"];
 
-const CreateKratong: NextPage<CreateKratongProps> = ({ selected, setSelected, nextPage }) => {
+const CreateKratong: FC<CreateKratongProps> = ({ selected, setSelected, nextPage }) => {
   const [section, setSection] = useState<"base" | "flowers" | "candles" | "decorations">("base");
 
-  const generate = (part: "base" | "flowers" | "candles" | "decorations") => {
-    let parts: any[] = [];
-
-    Object.values(KratongMap[part]).forEach((k, i) => {
-      // @ts-ignore
-      const data = k;
-      parts[i] = [
-        ...(parts[i] || []),
-        <KratongTile key={i} selected={selected} setSelected={setSelected} data={data} part={part} />,
-      ];
-    });
-
-    return parts.map((d, i) => (
-      <Fragment key={`col-${i}`}>
-        {d.map((g: Element, idx: number) => (
-          <Fragment key={idx}>{g}</Fragment>
-        ))}
-      </Fragment>
+  const generate = (part: "base" | "flowers" | "candles" | "decorations") =>
+    (Object.values(KratongMap[part]) as (KratongType | KratongTypeVariant)[]).map((data, i) => (
+      <KratongTile key={i} selected={selected} setSelected={setSelected} data={data} part={part} />
     ));
-  };
 
-  const generateDecorations = (index: number) => {
-    let parts: any[] = [];
-
-    Object.values(KratongMap["decorations"])
+  const generateDecorations = (index: number) =>
+    (Object.values(KratongMap["decorations"]) as (KratongType | KratongTypeVariant)[])
       .filter((data) => (index === 1 ? data.type === "variant" : data.type !== "variant"))
-      .forEach((data, i) => {
-        // @ts-ignore
-        parts[i] = [
-          ...(parts[i] || []),
-          <KratongTile key={i} selected={selected} setSelected={setSelected} data={data} part={"decorations"} />,
-        ];
-      });
-
-    return parts.map((d, i) => (
-      <Fragment key={`col-${i}`}>
-        {d.map((g: Element, idx: number) => (
-          <Fragment key={idx}>{g}</Fragment>
-        ))}
-      </Fragment>
-    ));
-  };
+      .map((data, i) => (
+        <KratongTile key={i} selected={selected} setSelected={setSelected} data={data} part={"decorations"} />
+      ));
 
   return (
     <div className="flex items-center fixed min-h-screen w-full top-0 z-20 px-10 font-ui">
-      <div className="flex flex-col border border-white bg-white bg-opacity-20 backdrop-blur-lg max-w-[525px] w-full mx-auto rounded-[34px]">
+      <div className="flex flex-col border border-white bg-white/20 max-w-[525px] w-full mx-auto rounded-[34px]">
         <div className="h-full pt-8 pb-4 sm:pb-2 w-full">
           <h1 className="text-white text-2xl text-center mb-0 sm:mb-1">สร้างกระทง</h1>
           <div className="flex flex-col items-center">
@@ -137,14 +106,14 @@ const CreateKratong: NextPage<CreateKratongProps> = ({ selected, setSelected, ne
             </svg>
           </div>
         </div>
-        <div className="flex flex-col relative z-10 space-y-2 justify-between border border-white bg-white bg-opacity-40 h-full rounded-[34px] w-full pb-2">
+        <div className="flex flex-col relative z-10 space-y-2 justify-between border border-white bg-white/40 h-full rounded-[34px] w-full pb-2">
           <div className="space-y-6">
-            <div className="flex justify-center w-full mb-4 py-2 px-4 space-x-4 sm:space-x-6 rounded-t-[34px] bg-white bg-opacity-40">
+            <div className="flex justify-center w-full mb-4 py-2 px-4 space-x-4 sm:space-x-6 rounded-t-[34px] bg-white/40">
               <button
                 onClick={() => {
                   setSection("base");
                 }}
-                className={classnames(
+                className={clsx(
                   "px-3 sm:px-8 py-2 rounded-[20%] sm:rounded-full font-light text-sm transition-colors",
                   section === "base"
                     ? "bg-[#2256A3] text-white shadow-lg"
@@ -157,7 +126,7 @@ const CreateKratong: NextPage<CreateKratongProps> = ({ selected, setSelected, ne
                 onClick={() => {
                   setSection("flowers");
                 }}
-                className={classnames(
+                className={clsx(
                   "px-2 sm:px-4 py-2 rounded-[20%] sm:rounded-full font-light text-sm transition-colors",
                   section === "flowers"
                     ? "bg-[#2256A3] text-white shadow-lg"
@@ -170,7 +139,7 @@ const CreateKratong: NextPage<CreateKratongProps> = ({ selected, setSelected, ne
                 onClick={() => {
                   setSection("candles");
                 }}
-                className={classnames(
+                className={clsx(
                   "px-2 sm:px-4 py-2 rounded-[20%] sm:rounded-full font-light text-sm transition-colors",
                   section === "candles"
                     ? "bg-[#2256A3] text-white shadow-lg"
@@ -183,7 +152,7 @@ const CreateKratong: NextPage<CreateKratongProps> = ({ selected, setSelected, ne
                 onClick={() => {
                   setSection("decorations");
                 }}
-                className={classnames(
+                className={clsx(
                   "px-2 sm:px-6 py-2 rounded-[20%] sm:rounded-full font-light text-sm transition-colors",
                   section === "decorations"
                     ? "bg-[#2256A3] text-white shadow-lg"
@@ -214,7 +183,7 @@ const CreateKratong: NextPage<CreateKratongProps> = ({ selected, setSelected, ne
                             transition: { duration: 0.1 },
                           }}
                           whileTap={{ scale: 0.9 }}
-                          className={classnames(
+                          className={clsx(
                             "p-4 mr-2 mb-6 rounded-full border border-white hover:opacity-90 cursor-pointer shadow-md",
                             selected.signVariant === i ? "border-2 opacity-100" : "opacity-50"
                           )}
@@ -240,7 +209,7 @@ const CreateKratong: NextPage<CreateKratongProps> = ({ selected, setSelected, ne
           )}
           <div className="flex justify-end px-4 mt-1">
             <button
-              className="flex items-center text-[12px] sm:text-md bg-[#2256A3] text-white px-6 py-2 space-x-1 rounded-full font-light"
+              className="flex items-center text-[12px] bg-[#2256A3] text-white px-6 py-2 space-x-1 rounded-full font-light"
               onClick={() => nextPage()}
             >
               <span>ถัดไป</span>
@@ -267,7 +236,7 @@ interface WishError {
   content: string[] | null;
 }
 
-const CreateWish: NextPage<CreateWishProps> = ({ selected, wish, setWish, nextPage, prevPage }) => {
+const CreateWish: FC<CreateWishProps> = ({ selected, wish, setWish, prevPage }) => {
   const CharLimits = {
     name: 64,
     content: 280,
@@ -279,8 +248,8 @@ const CreateWish: NextPage<CreateWishProps> = ({ selected, wish, setWish, nextPa
   const [loading, setLoading] = useState(false);
 
   const validateValues = () => {
-    let nameErrors = [];
-    let contentErrors = [];
+    const nameErrors: string[] = [];
+    const contentErrors: string[] = [];
 
     if (wish.name.length === 0) nameErrors.push("โปรดกรอกข้อมูลดังกล่าว");
     if (wish.content.length === 0) contentErrors.push("โปรดกรอกข้อมูลดังกล่าว");
@@ -301,18 +270,22 @@ const CreateWish: NextPage<CreateWishProps> = ({ selected, wish, setWish, nextPa
   const save = async () => {
     setLoading(true);
     const entityData = { kratong: selected, wish: wish };
-    const kratongData = await pushKratongContext.call({ data: entityData });
+    const kratongData = await pushKratong({ data: entityData });
 
     if (!kratongData.status) {
-      let nameErrors = [];
-      let contentErrors = [];
+      const nameErrors: string[] = [];
+      const contentErrors: string[] = [];
 
-      if (kratongData.data.location === "name") {
-        nameErrors.push("ข้อมูลข้างต้นมีคำที่ไม่เหมาะสม");
-      }
+      if (kratongData.report === "cursed") {
+        if (kratongData.data.location === "name") {
+          nameErrors.push("ข้อมูลข้างต้นมีคำที่ไม่เหมาะสม");
+        }
 
-      if (kratongData.data.location === "content") {
-        contentErrors.push("ข้อมูลข้างต้นมีคำที่ไม่เหมาะสม");
+        if (kratongData.data.location === "content") {
+          contentErrors.push("ข้อมูลข้างต้นมีคำที่ไม่เหมาะสม");
+        }
+      } else {
+        contentErrors.push("เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง");
       }
 
       setError({
@@ -323,12 +296,10 @@ const CreateWish: NextPage<CreateWishProps> = ({ selected, wish, setWish, nextPa
       return;
     }
 
-    if (kratongData.status || !loading) {
-      const id = kratongData.data.id;
-      localStorage.setItem("entityId", id);
-      localStorage.setItem("entity", JSON.stringify(entityData));
-      router.push("/loykratong");
-    }
+    const id = kratongData.data.id;
+    localStorage.setItem("entityId", id);
+    localStorage.setItem("entity", JSON.stringify(entityData));
+    router.push("/loykratong");
   };
 
   return (
@@ -337,7 +308,7 @@ const CreateWish: NextPage<CreateWishProps> = ({ selected, wish, setWish, nextPa
         {loading ? (
           <span className="font-ui font-light mt-4 text-center text-white animate-pulse w-full">กำลังโหลด...</span>
         ) : (
-          <div className="flex flex-col border border-white bg-white bg-opacity-20 backdrop-blur-lg max-w-[525px] w-full mx-auto rounded-[34px]">
+          <div className="flex flex-col border border-white bg-white/20 max-w-[525px] w-full mx-auto rounded-[34px]">
             <div className="h-full pt-8 pb-4 sm:pb-2 w-full">
               <h1 className="text-white text-2xl text-center mb-0 sm:mb-1">ใส่คำอธิษฐาน</h1>
               <div className="flex flex-col items-center">
@@ -357,9 +328,9 @@ const CreateWish: NextPage<CreateWishProps> = ({ selected, wish, setWish, nextPa
                 </svg>
               </div>
             </div>
-            <div className="flex flex-col relative z-10 space-y-2 justify-between border border-white bg-white bg-opacity-40 h-full rounded-[34px] w-full pb-2">
+            <div className="flex flex-col relative z-10 space-y-2 justify-between border border-white bg-white/40 h-full rounded-[34px] w-full pb-2">
               <div>
-                <div className="flex flex-col space-y-2 justify-between w-full pt-6 px-4 sm:px-8 flex-grow-1 mt-3 overflow-y-auto">
+                <div className="flex flex-col space-y-2 justify-between w-full pt-6 px-4 sm:px-8 mt-3 overflow-y-auto">
                   <div className="w-full">
                     <fieldset>
                       <label className="text-sm text-white" htmlFor="name">
@@ -377,7 +348,7 @@ const CreateWish: NextPage<CreateWishProps> = ({ selected, wish, setWish, nextPa
                           });
                         }}
                         value={wish.name ?? ""}
-                        className="block w-full mt-2 bg-transparent placeholder-opacity-70 placeholder-[#eee] text-[#fff] outline-none border-b-2 border-white px-2 pt-2 pb-1 mb-4"
+                        className="block w-full mt-2 bg-transparent placeholder:text-[#eee]/70 text-[#fff] outline-hidden border-b-2 border-white px-2 pt-2 pb-1 mb-4"
                         placeholder="นายเรียนเด่น เล่นดี"
                       />
                     </fieldset>
@@ -406,7 +377,7 @@ const CreateWish: NextPage<CreateWishProps> = ({ selected, wish, setWish, nextPa
                           });
                         }}
                         value={wish.content ?? ""}
-                        className="block w-full mt-2 bg-transparent placeholder-opacity-70 placeholder-[#eee] text-[#fdfdfd] outline-none border-b-2 border-white px-2 pt-2 pb-1  mb-4"
+                        className="block w-full mt-2 bg-transparent placeholder:text-[#eee]/70 text-[#fdfdfd] outline-hidden border-b-2 border-white px-2 pt-2 pb-1  mb-4"
                         placeholder="กรอกคำอธิษฐาน"
                       />
                     </fieldset>
@@ -422,7 +393,7 @@ const CreateWish: NextPage<CreateWishProps> = ({ selected, wish, setWish, nextPa
               </div>
               <div className="flex justify-end space-x-2 px-4">
                 <button
-                  className="flex items-center text-[12px] sm:text-md bg-transparent text-white border border-white px-6 py-2 space-x-1 rounded-full font-light"
+                  className="flex items-center text-[12px] bg-transparent text-white border border-white px-6 py-2 space-x-1 rounded-full font-light"
                   onClick={() => prevPage()}
                 >
                   <ChevronLeftIcon className="w-5 h-5" />
@@ -430,7 +401,7 @@ const CreateWish: NextPage<CreateWishProps> = ({ selected, wish, setWish, nextPa
                 </button>
 
                 <button
-                  className="flex items-center bg-[#2256A3] text-[12px] sm:text-md text-white px-6 py-2 rounded-full shadow-lg font-light"
+                  className="flex items-center bg-[#2256A3] text-[12px] text-white px-6 py-2 rounded-full shadow-lg font-light"
                   onClick={() => {
                     if (!validateValues()) return;
                     save();
@@ -456,13 +427,13 @@ export type { ResultData };
 //   prevPage: () => void;
 // }
 
-// const Result: NextPage<ResultProps> = ({data, prevPage}) => {
+// const Result: FC<ResultProps> = ({data, prevPage}) => {
 
 //   return (
 //     <>
 //       <div className="flex items-center fixed min-h-screen w-full top-0 z-20 px-10 font-ui">
 //         <div
-//           className="flex flex-col justify-center items-center space-y-6 border border-white bg-white bg-opacity-20 backdrop-blur-lg h-[80vh] max-h-[650px] max-w-[525px] w-full mx-auto rounded-[34px]">
+//           className="flex flex-col justify-center items-center space-y-6 border border-white bg-white/20 h-[80vh] max-h-[650px] max-w-[525px] w-full mx-auto rounded-[34px]">
 //           <div className="pt-8 pb-4 sm:pb-2 w-full">
 //             <h1 className="text-white text-2xl text-center mb-8">สำเร็จ</h1>
 //             <p className="text-white font-light text-lg text-center mb-2">{data.wish.name}:</p>
@@ -502,9 +473,9 @@ export type { ResultData };
 import type { ResultData as KratongData } from "@types-app/kratong";
 export type { KratongData };
 
-export const Create: NextPage<{ idata: KratongData }> = ({ idata }) => {
+export const Create: FC<{ idata?: KratongData | null }> = ({ idata }) => {
   const [data, setData] = useState<KratongData>(
-    Object.keys(idata).length > 1
+    idata && Object.keys(idata).length > 1
       ? idata
       : {
           kratong: {
@@ -541,24 +512,24 @@ export const Create: NextPage<{ idata: KratongData }> = ({ idata }) => {
     });
   };
 
-  const NextPage = () => {
+  const goNext = () => {
     setPage((currPage) => (currPage === 3 ? currPage : currPage + 1));
   };
 
-  const PrevPage = () => {
+  const goPrev = () => {
     setPage((currPage) => (currPage === 1 ? currPage : currPage - 1));
   };
 
   return (
     <>
-      {page === 1 && <CreateKratong selected={data.kratong} setSelected={setKratong} nextPage={NextPage} />}
+      {page === 1 && <CreateKratong selected={data.kratong} setSelected={setKratong} nextPage={goNext} />}
       {page === 2 && (
         <CreateWish
           wish={data.wish}
           setWish={setWish}
           selected={data.kratong}
-          nextPage={NextPage}
-          prevPage={PrevPage}
+          nextPage={goNext}
+          prevPage={goPrev}
         />
       )}
     </>

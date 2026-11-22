@@ -1,20 +1,19 @@
-import { motion } from "framer-motion";
-import type { NextPage } from "next";
+"use client";
+
+import { motion } from "motion/react";
 import { useState } from "react";
 import Image from "next/image";
 import { LightWater } from "@components/Water";
-import { useWindowDimensions } from "@utils/useWindowDimensions";
 import { Cloud } from "@components/Vector/cloud";
-import Link from "next/link";
-import Router from "next/router";
+import { useRouter } from "next/navigation";
 
 const DURATION = 2000;
 const DELAY = 250;
 
-export const PageOne: NextPage = () => {
+export function PageOne() {
   return (
     <motion.div
-      key="page"
+      key="page-1"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -29,12 +28,12 @@ export const PageOne: NextPage = () => {
       <p className="text-center font-normal mt-4 text-gray-300 sm:text-lg blinking-text">แตะเพื่อไปต่อ</p>
     </motion.div>
   );
-};
+}
 
-export const PageTwo: NextPage = () => {
+export function PageTwo() {
   return (
     <motion.div
-      key="page"
+      key="page-2"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -53,12 +52,12 @@ export const PageTwo: NextPage = () => {
       <p className="text-center font-normal mt-4 text-gray-300 sm:text-lg blinking-text">แตะเพื่อไปต่อ</p>
     </motion.div>
   );
-};
+}
 
-export const PageThree: NextPage = () => {
+export function PageThree() {
   return (
     <motion.div
-      key="page"
+      key="page-3"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -73,18 +72,18 @@ export const PageThree: NextPage = () => {
       <p className="text-center font-normal mt-4 text-gray-300 sm:text-lg blinking-text">แตะเพื่อไปต่อ</p>
     </motion.div>
   );
-};
+}
 
 interface PageFourProps {
   nextPage: () => void;
 }
 
-export const PageFour: NextPage<PageFourProps> = ({ nextPage }) => {
+export function PageFour({ nextPage }: PageFourProps) {
   const [going, setGoing] = useState<null | boolean>(null);
 
   return (
     <motion.div
-      key="page"
+      key="page-4"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -134,14 +133,14 @@ export const PageFour: NextPage<PageFourProps> = ({ nextPage }) => {
       )}
     </motion.div>
   );
-};
+}
 
-export const PageFive: NextPage = () => {
-  const { width, height } = useWindowDimensions();
+export function PageFive() {
+  const router = useRouter();
 
   return (
     <motion.div
-      key="page"
+      key="page-5"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -169,7 +168,7 @@ export const PageFive: NextPage = () => {
           <p className="font-display font-light text-center text-3xl sm:text-4xl">โอเค ไปลอยกระทงกัน !</p>
           <a
             onClick={() => {
-              Router.push("/create");
+              router.push("/create");
               localStorage.setItem("story", "done");
             }}
             className="cursor-pointer transition-colors hover:bg-gray-300 px-4 py-2 w-[130px] text-center font-normal sm:text-lg mt-4 rounded-full text-[#4A4A4A] bg-white border-white border"
@@ -178,34 +177,34 @@ export const PageFive: NextPage = () => {
           </a>
         </div>
 
-        <div className="absolute w-[550px] sm:w-[650px] lg:w-[700px] bottom-[-30px] z-[-1] left-[50%] -translate-x-1/2">
+        <div className="absolute w-[550px] sm:w-[650px] lg:w-[700px] bottom-[-30px] z-[-1] left-[50%]">
           <Image
             width={1350}
             height={753}
             priority={true}
-            objectFit={"contain"}
+            className="object-contain"
             src="/assets/images/scene/sala-front-no-fence.png"
             alt="ศาลา"
           />
         </div>
 
-        {/* <div className="absolute w-[550px] sm:w-[650px] lg:w-[700px] bottom-[-30px] z-[-1] left-[50%] -translate-x-1/2">
+        {/* <div className="absolute w-[550px] sm:w-[650px] lg:w-[700px] bottom-[-30px] z-[-1] left-[50%]">
           <Image
             width={1350}
             height={1350}
             priority={true}
-            objectFit={"contain"}
+            className="object-contain"
             src="/assets/images/scene/sala-front-nofence.png"
             alt="ศาลา"
           />
         </div> */}
 
-        <div className="absolute w-full bottom-[-77px] sm:bottom-[-160px] lg:bottom-[-40%] z-[-2] left-[50%] -translate-x-1/2">
+        <div className="absolute w-full bottom-[-77px] sm:bottom-[-160px] lg:bottom-[-40%] z-[-2] left-[50%]">
           <Image
             width={2000}
             height={1350}
             priority={true}
-            objectFit={"contain"}
+            className="object-contain"
             src="/assets/images/scene/fence.png"
             alt="รั้วศาลา"
           />
@@ -217,4 +216,4 @@ export const PageFive: NextPage = () => {
       </div>
     </motion.div>
   );
-};
+}

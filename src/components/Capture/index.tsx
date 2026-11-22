@@ -1,29 +1,24 @@
-import type { NextPage } from "next";
-import styles from "@styles/modules/Capture.module.scss";
-import { Navbar } from "@components/Nav";
+"use client";
+
+import type { FC } from "react";
 import Image from "next/image";
 import { Cloud } from "@components/Vector/cloud";
 import { WaterFour, WaterOne, WaterThree, WaterTwo } from "@components/Water";
-import classNames from "classnames";
-import { PrincipalKratongData, RongPrincipalKratongsData } from "@map/realkratong";
-import { IdleKratong } from "@components/LoyKratong/displaykratong";
-import { useWindowDimensions } from "@utils/useWindowDimensions";
-import { random } from "@utils/random";
-import { Kratong } from "@components/Kratong/kratong";
-import { KratongData, Selected } from "@components/Kratong/create";
+import clsx from "clsx";
+import type { KratongData } from "@types-app/kratong";
 import { IdleCaptureKratong } from "./capturekratong";
 
-export const CaptureKratong: NextPage<{ data: KratongData }> = ({ data }) => {
-  const { width } = useWindowDimensions();
+const layer = "absolute left-[calc(-2vw_-_350px)]";
 
+export const CaptureKratong: FC<{ data: KratongData }> = ({ data }) => {
   return (
-    <div className={styles["capture-scene"]}>
+    <div className="relative h-[1920px] w-[1080px] bg-[#eee]">
       <nav className="absolute top-[46px] left-[48px]  w-full z-[99]">
         <div className="max-w-[306px]">
-          <Image src="/assets/images/logo.png" width="1024px" height="169px" alt="โลโก้ กช." />
+          <Image src="/assets/images/logo.png" width={1024} height={169} alt="โลโก้ กช." />
         </div>
       </nav>
-      <div className={styles["sky"]}>
+      <div className="absolute top-[5px] z-[9] w-full">
         <div className="w-[490px] absolute z-[3] left-[-96px] top-[201px] opacity-[15%] ">
           <Cloud />
         </div>
@@ -33,11 +28,11 @@ export const CaptureKratong: NextPage<{ data: KratongData }> = ({ data }) => {
         <div className="w-[465px] absolute z-[3] right-[-96px] top-[231px] opacity-[15%] ">
           <Cloud />
         </div>
-        <div className={styles["moon"]}>
-          <div className={styles["img"]}>
+        <div className="absolute right-[46px] top-[35px] z-[8] h-[375px] w-[375px]">
+          <div className="absolute left-1/2 top-1/2 z-[7] w-[65%] -translate-x-1/2 -translate-y-1/2">
             <img src="/assets/images/scene/moon.gif" width={2048} height={2048} alt="ดวงจันทร์" />
           </div>
-          <div className={styles["blur"]}>
+          <div className="absolute top-0 z-[6]">
             <img src="/assets/images/scene/blur.png" width={3414} height={3414} alt="ดวงจันทร์" />
           </div>
         </div>
@@ -47,14 +42,14 @@ export const CaptureKratong: NextPage<{ data: KratongData }> = ({ data }) => {
         <div className={styles["fireworks-2"]}>
           <Image src="/assets/images/scene/fireworks-purple.png" width={692} height={754} />
         </div> */}
-        <div className={styles["fireworks-new"]}>
-          <img src="/assets/images/scene/capture-fireworks-flipped.png" width={2048} height={2048} />
+        <div className="absolute left-[200px] top-[65px] z-[7] h-[494px] w-[640px]">
+          <img src="/assets/images/scene/capture-fireworks-flipped.png" width={2048} height={2048} alt="" />
         </div>
       </div>
-      <div className={styles["background"]}>
-        <div className={classNames("absolute", styles["waterfour-container"])}>
+      <div className="relative h-full w-full overflow-hidden bg-[linear-gradient(180deg,#000000_0%,#236bad_70.87%)]">
+        <div className={clsx(layer, "z-10 bottom-[30px]")}>
           <div className="relative w-[554vw] bottom-[-193px]">
-            <div className={styles["buildings"]}>
+            <div className="absolute top-[-166px] z-[5] flex w-[300vw]">
               <div className="w-[275%]">
                 <img src="/assets/images/scene/buildings.png" width={2328} height={318} alt="ตึก" />
               </div>
@@ -63,12 +58,12 @@ export const CaptureKratong: NextPage<{ data: KratongData }> = ({ data }) => {
           </div>
         </div>
 
-        <div className={classNames("absolute", styles["waterthree-container"])}>
+        <div className={clsx(layer, "z-20 bottom-[110px]")}>
           <div className="relative w-[554vw] bottom-[-526px]">
             <WaterThree />
             <IdleCaptureKratong
               lane="t"
-              className="absolute z-[29] brightness-[40%]"
+              className="absolute z-[29]"
               data={{
                 kratong: {
                   base: "banana-leaf",
@@ -87,7 +82,7 @@ export const CaptureKratong: NextPage<{ data: KratongData }> = ({ data }) => {
 
             <IdleCaptureKratong
               lane="t"
-              className="absolute z-[29] brightness-[40%]"
+              className="absolute z-[29]"
               data={{
                 kratong: {
                   base: "ice",
@@ -106,7 +101,7 @@ export const CaptureKratong: NextPage<{ data: KratongData }> = ({ data }) => {
           </div>
         </div>
 
-        <div className={classNames("absolute", styles["watertwo-container"])}>
+        <div className={clsx(layer, "z-30 bottom-[-474px]")}>
           <div className="relative w-[554vw] bottom-[-344px]">
             <IdleCaptureKratong
               lane="m"
@@ -121,11 +116,11 @@ export const CaptureKratong: NextPage<{ data: KratongData }> = ({ data }) => {
           </div>
         </div>
 
-        <div className={classNames("absolute", styles["waterone-container"])}>
+        <div className={clsx(layer, "z-40 bottom-[-17px]")}>
           <div className="relative w-[554vw] bottom-[-1049px]">
             <IdleCaptureKratong
               lane="b"
-              className="absolute z-[29] brightness-[65%]"
+              className="absolute z-[29]"
               data={{
                 kratong: {
                   base: "ice",
@@ -145,7 +140,7 @@ export const CaptureKratong: NextPage<{ data: KratongData }> = ({ data }) => {
 
             <IdleCaptureKratong
               lane="b"
-              className="absolute z-[29] brightness-[65%]"
+              className="absolute z-[29]"
               data={{
                 kratong: {
                   base: "coconut-shell",

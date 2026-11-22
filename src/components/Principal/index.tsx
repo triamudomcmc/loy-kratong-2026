@@ -1,16 +1,13 @@
-import type { NextPage } from "next";
-import styles from "@styles/modules/Principal.module.scss";
 import { SalaFrontBG } from "@components/Background";
+import { principalCls } from "@components/kratong-classes";
 import { Create } from "./create";
-import { KratongData } from "@components/Principal/create";
+import type { PrincipalKratongData } from "@types-app/kratong";
 
-export const PrincipalPage: NextPage<{ data: KratongData }> = ({ data }) => {
+export const PrincipalPage = ({ id, data }: { id: string; data: PrincipalKratongData }) => {
   return (
-    <>
-      <article className={styles["scene"]}>
-        <SalaFrontBG />
-        <Create idata={data} />
-      </article>
-    </>
+    <article className={principalCls.scene}>
+      <SalaFrontBG />
+      <Create id={id} idata={data} />
+    </article>
   );
 };

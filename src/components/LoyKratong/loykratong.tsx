@@ -1,19 +1,17 @@
-import type { NextPage } from "next";
-import styles from "@styles/modules/LoyKratong.module.scss";
+"use client";
+
+import type { FC } from "react";
 import { WaterFour, WaterOne, WaterThree, WaterTwo } from "@components/Water";
 import Image from "next/image";
 import { Cloud } from "@components/Vector/cloud";
-import classNames from "classnames";
-import { BotLane, Fish, MidLane, MovingKratong, TopLane } from "./kratonglane";
-import { ResultData } from "@components/Kratong/create";
-import { AnimatePresence, motion } from "framer-motion";
-import { Kratong } from "@components/Kratong/kratong";
+import clsx from "clsx";
+import { BotLane, MidLane, MovingKratong, TopLane } from "./kratonglane";
+import type { ResultData } from "@types-app/kratong";
+import { AnimatePresence, motion } from "motion/react";
 import { CUPSAAIdleKratong, DraggableKratong, IdleKratong, PrincipalIdleKratong } from "./displaykratong";
 import { useWindowDimensions } from "@utils/useWindowDimensions";
 import { CUPSAAKratongData, PrincipalKratongData, RongPrincipalKratongsData } from "@map/realkratong";
 import { useEffect, useState } from "react";
-import { Pantoloy } from "@components/Vector/pantoloy";
-import Router from "next/router";
 
 function random(min: number, max: number) {
   min = Math.ceil(min);
@@ -21,7 +19,8 @@ function random(min: number, max: number) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-function shuffle(array: Array<any>) {
+function shuffle<T>(input: T[]): T[] {
+  const array = [...input];
   let currentIndex = array.length,
     randomIndex;
 
@@ -38,11 +37,11 @@ function shuffle(array: Array<any>) {
   return array;
 }
 
-function chunk(arr: Array<any>, cCount: number) {
+function chunk<T>(arr: T[], cCount: number) {
   const len = Math.ceil(arr.length / cCount);
-  let chunks = [],
-    i = 0,
-    n = arr.length;
+  const chunks: T[][] = [];
+  const n = arr.length;
+  let i = 0;
 
   while (i < n) {
     chunks.push(arr.slice(i, (i += len)));
@@ -51,66 +50,40 @@ function chunk(arr: Array<any>, cCount: number) {
   return chunks;
 }
 
-const sample = {
-  kratong: {
-    base: "banana-leaf",
-    candles: "candle-green",
-    decorations: "swan",
-    flowers: "luck",
-    signVariant: 0,
-  },
-  wish: {
-    name: "hi",
-    content: "hi",
-  },
-};
-
-const LoyKratongScene: NextPage<{ entities: ResultData[] }> = ({ entities }) => {
-  const { width, height } = useWindowDimensions();
-  const [loy, setloy] = useState(false);
+const LoyKratongScene: FC<{ entities: ResultData[] }> = ({ entities }) => {
+  const { width } = useWindowDimensions();
   const [localLoy, setLocalLoy] = useState(false);
   const [done, setDone] = useState(false);
   const [lanes, setLanes] = useState<ResultData[][]>([[], [], []]);
-  const [idle, setIdle] = useState(<></>);
+  const [idle, setIdle] = useState<{ data: ResultData; initialX: number } | null>(null);
 
   const [prevEntity, setPrevEntity] = useState<undefined | ResultData>(undefined);
 
+  /* eslint-disable react-hooks/set-state-in-effect -- browser-only values (localStorage, viewport, random) are read after mount to stay SSR-safe */
   useEffect(() => {
     const cwidth = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
-    setloy(localStorage.getItem("released") === "true");
     setLocalLoy(localStorage.getItem("released") === "true");
     setPrevEntity(JSON.parse(localStorage.getItem("entity") || "{}"));
     setDone(true);
-    setIdle(
-      <IdleKratong
-        highlighted
-        className={
-          "transition-opacity absolute top-[-50px] sm:top-[-90px] nak:top-[-60px] lg:top-[-46px] hover:brightness-100 active:brightness-110"
-        }
-        lane="m"
-        size={["155px", "115px"]}
-        initialX={cwidth > 640 ? 550 : 350}
-        data={RongPrincipalKratongsData[random(0, 3)]}
-      />
-    );
+    setIdle({
+      data: RongPrincipalKratongsData[random(0, 3)],
+      initialX: cwidth > 640 ? 550 : 350,
+    });
   }, []);
 
   useEffect(() => {
     if (entities.length > 0) {
-      const lanes = chunk(entities, 3);
-      setLanes(lanes);
+      setLanes(chunk(shuffle(entities), 3));
     }
   }, [entities]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
-  shuffle(entities);
-
-  // @ts-ignore
   return (
-    // <div className={styles["loy-scene"]}>
-    <div className="w-[250vw] nak:w-[210vw] sm:w-[128vw] lg:w-[175vw]">
-      {!localLoy && (
-        <AnimatePresence>
+    <div className="w-[250vw] nak:w-[210vw] lg:w-[175vw]">
+      <AnimatePresence>
+        {!localLoy && (
           <motion.div
+            key="pantoloy"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -118,11 +91,9 @@ const LoyKratongScene: NextPage<{ entities: ResultData[] }> = ({ entities }) => 
           >
             {/* <Pantoloy /> */}
           </motion.div>
-        </AnimatePresence>
-      )}
-      {/* <div className={styles["sky"]}> */}
+        )}
+      </AnimatePresence>
       <div className="fixed w-[100vw] top-[-49px] z-[9] xl:top-[-31px]">
-        {/* <div className={styles["clouds"]}> */}
         <div className="absolute w-full top-[50px] z-[4]">
           <div className="w-[150px] sm:w-[125px] absolute z-[3] left-[-50px] top-[75px] sm:top-[55px] opacity-[15%] ">
             <Cloud />
@@ -167,83 +138,60 @@ const LoyKratongScene: NextPage<{ entities: ResultData[] }> = ({ entities }) => 
             <Cloud />
           </div>
         </div>
-
-        {/* <div className={styles["moon"]}> */}
         <div className="absolute w-[150px] h-[150px] right-[10vw] top-[35px] z-[8]">
-          {/* <div className={styles["img"]}> */}
-          <div className="absolute w-[65%] left-[50%] top-[50%] -translate-x-1/2 -translate-y-1/2 z-[7]">
-            <Image src="/assets/images/scene/moon.gif" width={2048} height={2048} objectFit="cover" alt="ดวงจันทร์" />
+          <div className="absolute w-[65%] left-[50%] top-[50%] z-[7]">
+            <Image src="/assets/images/scene/moon.gif" width={2048} height={2048} className="object-cover" alt="ดวงจันทร์" />
           </div>
-          {/* <div className={styles["blur"]}> */}
           <div className="absolute top-0 z-[6]">
-            <Image src="/assets/images/scene/blur.png" width={3414} height={3414} objectFit="cover" alt="ดวงจันทร์" />
+            <Image src="/assets/images/scene/blur.png" width={3414} height={3414} className="object-cover" alt="ดวงจันทร์" />
           </div>
         </div>
       </div>
-
-      {/* <div className={styles["background"]}> 512 */}
-      <div className="h-[100vh] bg-black bg-loy relative overflow-hidden w-[250vw] nak:w-[210vw] sm:w-[128vw] lg:w-[175vw]">
+      <div className="h-[100vh] bg-black bg-loy relative overflow-hidden w-[250vw] nak:w-[210vw] lg:w-[175vw]">
         <div className="relative left-[24px] top-[12px]">
-          {/* <div className={styles["fireworks-1"]}> */}
           <div className="absolute w-[225px] h-[225px] top-[75px] left-[9px] z-[10]">
-            <Image src="/assets/images/scene/fireworks-blue.gif" width={441} height={480} />
+            <Image src="/assets/images/scene/fireworks-blue.gif" width={441} height={480} alt="" />
           </div>
-
-          {/* <div className={styles["fireworks-2"]}> */}
           <div className="absolute w-[174px] h-[200px] top-[105px] left-[189px] z-[10]">
-            <Image src="/assets/images/scene/fireworks-orange.gif" width={441} height={481} />
+            <Image src="/assets/images/scene/fireworks-orange.gif" width={441} height={481} alt="" />
           </div>
-
-          {/* <div className={styles["fireworks-3"]}> */}
           <div className="absolute w-[174px] h-[200px] top-[55px] left-[551px] z-[10]">
-            <Image src="/assets/images/scene/fireworks-purple.gif" width={441} height={481} />
+            <Image src="/assets/images/scene/fireworks-purple.gif" width={441} height={481} alt="" />
           </div>
-
-          {/* <div className={styles["fireworks-4"]}> */}
           <div className="absolute w-[305px] h-[205px] top-[45px] left-[741px] z-[10]">
-            <Image src="/assets/images/scene/fireworks-white.gif" width={1280} height={960} />
+            <Image src="/assets/images/scene/fireworks-white.gif" width={1280} height={960} alt="" />
           </div>
 
           {width > 840 && (
             <>
-              {/* <div className={styles["fireworks-1"]}> */}
               <div className="absolute w-[225px] h-[225px] top-[75px] left-[1009px] z-[10]">
-                <Image src="/assets/images/scene/fireworks-blue.gif" width={441} height={480} />
+                <Image src="/assets/images/scene/fireworks-blue.gif" width={441} height={480} alt="" />
               </div>
-
-              {/* <div className={styles["fireworks-2"]}> */}
               <div className="absolute w-[174px] h-[200px] top-[105px] left-[1389px] z-[10]">
-                <Image src="/assets/images/scene/fireworks-orange.gif" width={441} height={481} />
+                <Image src="/assets/images/scene/fireworks-orange.gif" width={441} height={481} alt="" />
               </div>
-
-              {/* <div className={styles["fireworks-3"]}> */}
               <div className="absolute w-[174px] h-[200px] top-[55px] left-[1551px] z-[10]">
-                <Image src="/assets/images/scene/fireworks-purple.gif" width={441} height={481} />
+                <Image src="/assets/images/scene/fireworks-purple.gif" width={441} height={481} alt="" />
               </div>
-
-              {/* <div className={styles["fireworks-4"]}> */}
               <div className="absolute w-[305px] h-[205px] top-[45px] left-[1741px] z-[10]">
-                <Image src="/assets/images/scene/fireworks-white.gif" width={1280} height={960} />
+                <Image src="/assets/images/scene/fireworks-white.gif" width={1280} height={960} alt="" />
               </div>
             </>
           )}
         </div>
-
-        {/* <div className={classNames("absolute", styles["waterfour-container"])}> */}
         <div
           className={
             done ? "absolute left-[-50px] bottom-[70px] custom:bottom-[70px] nak:bottom-[-8px] lg:bottom-[-150px]" : ""
           }
         >
           <div className="relative">
-            {/* <div className={styles["buildings"]}> */}
-            <div className="absolute z-[5] flex width-[500vw] top-[-75px] custom:top-[-109px] sm:top-[-231px] lg:top-[-240px]  sm:w-[353vw] lg:w-[253vw]">
+            <div className="absolute z-[5] flex top-[-75px] custom:top-[-109px] sm:top-[-231px] lg:top-[-240px]  sm:w-[353vw] lg:w-[253vw]">
               <div className="w-[125%]">
                 <Image
                   src="/assets/images/scene/buildings-black.png"
                   width={2328}
                   height={318}
-                  objectFit="cover"
+                  className="object-cover"
                   alt="ตึก"
                 />
               </div>
@@ -252,15 +200,22 @@ const LoyKratongScene: NextPage<{ entities: ResultData[] }> = ({ entities }) => 
             <WaterFour />
           </div>
         </div>
-
-        {/* <div className={classNames("absolute", styles["waterthree-container"])}> */}
         <div
           className={
             done ? "absolute left-[-50px] bottom-[20px] custom:bottom-[60px] nak:bottom-[-68px] lg:bottom-[-220px]" : ""
           }
         >
           <div className="relative">
-            {idle}
+            {idle && (
+              <IdleKratong
+                highlighted
+                className="transition-opacity absolute top-[-50px] nak:top-[-60px] lg:top-[-46px]"
+                lane="m"
+                size={["155px", "115px"]}
+                initialX={idle.initialX}
+                data={idle.data}
+              />
+            )}
             <CUPSAAIdleKratong
               highlighted
               initialX={width > 640 ? 965 : 665}
@@ -268,15 +223,13 @@ const LoyKratongScene: NextPage<{ entities: ResultData[] }> = ({ entities }) => 
               lane="m"
               size={["185px", "135px"]}
               className={
-                "transition-opacity absolute top-[-48px] sm:top-[-90px] nak:top-[-60px] lg:top-[-44px] hover:brightness-100 active:brightness-110"
+                "transition-opacity absolute top-[-48px] nak:top-[-60px] lg:top-[-44px]"
               }
             />
             <MidLane entities={lanes[1]} />
             <WaterThree />
           </div>
         </div>
-
-        {/* <div className={classNames("absolute", styles["watertwo-container"])}> */}
         <div
           className={
             done
@@ -286,12 +239,11 @@ const LoyKratongScene: NextPage<{ entities: ResultData[] }> = ({ entities }) => 
         >
           <div className="relative">
             <div className="relative">
-              {/* <div className={styles["sala-side"]}> */}
               <div className="absolute left-[22px] z-[35] top-[-215px] w-[342px] max-w-[450px] select-none sm:top-[-334px] sm:w-[450px]">
                 <Image
                   width={1350}
                   height={1382}
-                  objectFit="contain"
+                  className="object-contain"
                   src="/assets/images/scene/sala-side.png"
                   alt="ศาลา"
                 />
@@ -299,9 +251,8 @@ const LoyKratongScene: NextPage<{ entities: ResultData[] }> = ({ entities }) => 
               {!localLoy && prevEntity && prevEntity?.kratong && prevEntity?.wish && (
                 <DraggableKratong
                   setLoy={setLocalLoy}
-                  // className={classNames(styles["loying-kratong"], width > 640 && "ml-16")}
-                  className={classNames(
-                    "absolute z-[36] top-[-108px] left-[112px] cursor-pointer sm:top-[-111px] nak:top-[-81px] sm:left-[183px]",
+                  className={clsx(
+                    "absolute z-[36] top-[-108px] left-[112px] cursor-pointer nak:top-[-81px] sm:left-[183px]",
                     width > 640 && "ml-16"
                   )}
                   data={prevEntity}
@@ -311,7 +262,7 @@ const LoyKratongScene: NextPage<{ entities: ResultData[] }> = ({ entities }) => 
               )}
             </div>
             <PrincipalIdleKratong
-              className="transition-opacity absolute top-[-74px] sm:top-[-102px] nak:top-[-72px] lg:top-[-68px] brightness-[99%] hover:brightness-100 active:brightness-110"
+              className="transition-opacity absolute top-[-74px] nak:top-[-72px] lg:top-[-68px]"
               lane="b"
               size={["200px", "170px"]}
               initialX={width > 640 ? 750 : 490}
@@ -320,7 +271,7 @@ const LoyKratongScene: NextPage<{ entities: ResultData[] }> = ({ entities }) => 
             {localLoy && prevEntity && (
               <MovingKratong
                 className={
-                  "transition-opacity absolute left-[350px] top-[-54px] sm:top-[-88px] nak:top-[-58px] lg:top-[-40px] brightness-[90%] hover:brightness-100 active:brightness-110"
+                  "transition-opacity absolute left-[350px] top-[-54px] nak:top-[-58px] lg:top-[-40px]"
                 }
                 initialX={width > 640 ? 62 : -25}
                 data={prevEntity}
@@ -328,13 +279,10 @@ const LoyKratongScene: NextPage<{ entities: ResultData[] }> = ({ entities }) => 
                 lane="b"
               />
             )}
-            {/* @ts-ignore */}
             <BotLane entities={lanes[2]} />
             <WaterTwo />
           </div>
         </div>
-
-        {/* <div className={classNames("absolute", styles["waterone-container"])}> */}
         <div
           className={
             done

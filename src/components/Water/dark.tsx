@@ -1,9 +1,7 @@
-import type { NextPage } from "next";
-import styles from "@styles/modules/LoyKratong.module.scss";
-import { motion } from "framer-motion";
-import { WaterFourData, WaterOneData, WaterThreeData, WaterTwoData } from "@map/animations";
+import type { FC } from "react";
+import { motion } from "motion/react";
 
-export const WaterOne: NextPage = () => {
+export const WaterOne: FC = () => {
   return (
     <motion.svg
       style={{ width: "125%", height: "100%", zIndex: 41, position: "relative" }}
@@ -50,7 +48,7 @@ export const WaterOne: NextPage = () => {
   );
 };
 
-export const WaterTwo: NextPage = () => {
+export const WaterTwo: FC = () => {
   return (
     <motion.svg
       style={{ width: "125%", height: "100%", zIndex: 31, position: "relative" }}

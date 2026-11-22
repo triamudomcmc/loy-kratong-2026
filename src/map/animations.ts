@@ -7,7 +7,7 @@ export const WaterOneData = {
     y: [0, WAVEUP, 0, WAVEDOWN, 0, WAVEUP, 0, WAVEDOWN, 0],
   },
   transition: {
-    type: "tween",
+    type: "tween" as const,
     repeat: Infinity,
     duration: DURATION / 1000,
     delay: 250 / 1000,
@@ -19,7 +19,7 @@ export const WaterTwoData = {
     y: [0, WAVEUP, 0, WAVEDOWN, 0, WAVEUP, 0, WAVEDOWN, 0],
   },
   transition: {
-    type: "tween",
+    type: "tween" as const,
     repeat: Infinity,
     duration: DURATION / 1000,
     delay: 450 / 1000,
@@ -31,7 +31,7 @@ export const WaterThreeData = {
     y: [0, WAVEUP, 0, WAVEDOWN, 0, WAVEUP, 0, WAVEDOWN, 0],
   },
   transition: {
-    type: "tween",
+    type: "tween" as const,
     repeat: Infinity,
     duration: DURATION / 1000,
     delay: 650 / 1000,
@@ -43,7 +43,7 @@ export const WaterFourData = {
     y: [0, WAVEUP, 0, WAVEDOWN, 0, WAVEUP, 0, WAVEDOWN, 0],
   },
   transition: {
-    type: "tween",
+    type: "tween" as const,
     repeat: Infinity,
     duration: DURATION / 1000,
     delay: 850 / 1000,

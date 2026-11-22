@@ -1,13 +1,13 @@
-import type { NextPage } from "next";
-import { Fragment, useEffect, useState } from "react";
+"use client";
+
+import { Fragment, useEffect, useRef, useState } from "react";
 import { PrincipalKratong } from "./kratong";
 import { PrincipalMap } from "@map/kratong";
 import Image from "next/image";
-import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/solid";
-import classnames from "classnames";
-import { useRouter } from "next/router";
-import { sendDataContext } from "@handlers/init";
-import { motion } from "framer-motion";
+import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
+import clsx from "clsx";
+import { sendData } from "@server/actions";
+import { motion } from "motion/react";
 
 import type { PrincipalSelected as Selected, Wish } from "@types-app/kratong";
 export type { Selected, Wish };
@@ -18,53 +18,44 @@ interface CreateKratongProps {
   nextPage: () => void;
 }
 
-const CreateKratong: NextPage<CreateKratongProps> = ({ selected, setSelected, nextPage }) => {
+const CreateKratong = ({ selected, setSelected, nextPage }: CreateKratongProps) => {
   const [section, setSection] = useState<"base" | "swan" | "candles" | "decorations">("base");
 
   const generate = (part: "base" | "swan" | "candles" | "decorations") => {
-    let parts: any[] = [];
-
-    Object.values(PrincipalMap[part]).forEach((k, i) => {
-      // @ts-ignore
-      const data = k;
-      const partLoc = Math.ceil((i + 1) / 3) - 1;
-      parts[partLoc] = [
-        ...(parts[partLoc] || []),
-        <motion.div
-          key={`part_${k.id}`}
-          whileHover={{
-            scale: 1.05,
-            transition: { duration: 0.1 },
-          }}
-          whileTap={{ scale: 0.9 }}
-          onClick={() => {
-            setSelected({ ...selected, [part]: data.id });
-          }}
-          className={classnames(
-            "border-2 rounded-[20%] cursor-pointer bg-[#F5F5FB] transition-opacity bg-opacity-40 hover:bg-opacity-60",
-            selected[part] === data.id ? "border-white" : "border-transparent"
-          )}
-        >
-          <div className="flex flex-col items-center mt-[-4px] mx-[-6px] p-4">
-            <Image objectFit="contain" alt={k["name"]} priority={true} width={2388} height={1668} src={data.url} />
-            <span className="text-sm text-center py-2 px-2 text-[#726EA5] flex-shrink-0 w-full">{data.name}</span>
-          </div>
-        </motion.div>,
-      ];
-    });
-
-    return parts.map((d, i) => (
-      <Fragment key={`col-${i}`}>
-        {d.map((g: Element, idx: number) => (
-          <Fragment key={idx}>{g}</Fragment>
-        ))}
-      </Fragment>
+    return Object.values(PrincipalMap[part]).map((data) => (
+      <motion.div
+        key={`part_${data.id}`}
+        whileHover={{
+          scale: 1.05,
+          transition: { duration: 0.1 },
+        }}
+        whileTap={{ scale: 0.9 }}
+        onClick={() => {
+          setSelected({ ...selected, [part]: data.id });
+        }}
+        className={clsx(
+          "border-2 rounded-[20%] cursor-pointer bg-[#F5F5FB]/40 hover:bg-[#F5F5FB]/60 transition-opacity",
+          selected[part] === data.id ? "border-white" : "border-transparent",
+        )}
+      >
+        <div className="flex flex-col items-center mt-[-4px] mx-[-6px] p-4">
+          <Image
+            className="max-w-full h-auto object-contain"
+            alt={data.name}
+            priority={true}
+            width={2388}
+            height={1668}
+            src={data.url}
+          />
+          <span className="text-sm text-center py-2 px-2 text-[#726EA5] shrink-0 w-full">{data.name}</span>
+        </div>
+      </motion.div>
     ));
   };
 
   return (
     <div className="flex items-center fixed min-h-screen w-full top-0 z-20 px-10 font-ui">
-      <div className="flex flex-col border border-white bg-white bg-opacity-20 backdrop-blur-lg max-w-[525px] w-full mx-auto rounded-[34px]">
+      <div className="flex flex-col border border-white bg-white/20 max-w-[525px] w-full mx-auto rounded-[34px]">
         <div className="h-full pt-8 pb-4 sm:pb-2 w-full">
           <h1 className="text-white text-2xl text-center mb-0 sm:mb-1">สร้างกระทง</h1>
           <div className="flex flex-col items-center">
@@ -84,18 +75,18 @@ const CreateKratong: NextPage<CreateKratongProps> = ({ selected, setSelected, ne
             </svg>
           </div>
         </div>
-        <div className="flex flex-col relative z-10 justify-between border border-white bg-white bg-opacity-40 h-full rounded-[34px] w-full pb-4">
+        <div className="flex flex-col relative z-10 justify-between border border-white bg-white/40 h-full rounded-[34px] w-full pb-4">
           <div className="space-y-6">
-            <div className="flex justify-center w-full mb-4 py-2 px-4 space-x-4 sm:space-x-6 rounded-t-[34px] bg-white bg-opacity-40">
+            <div className="flex justify-center w-full mb-4 py-2 px-4 space-x-4 sm:space-x-6 rounded-t-[34px] bg-white/40">
               <button
                 onClick={() => {
                   setSection("base");
                 }}
-                className={classnames(
+                className={clsx(
                   "px-3 sm:px-8 py-2 rounded-[20%] sm:rounded-full font-light text-sm transition-colors",
                   section === "base"
                     ? "bg-[#2256A3] text-white shadow-lg"
-                    : "bg-transparent text-[#2256A3] hover:text-[#0d264c]"
+                    : "bg-transparent text-[#2256A3] hover:text-[#0d264c]",
                 )}
               >
                 ฐาน
@@ -104,11 +95,11 @@ const CreateKratong: NextPage<CreateKratongProps> = ({ selected, setSelected, ne
                 onClick={() => {
                   setSection("swan");
                 }}
-                className={classnames(
+                className={clsx(
                   "px-2 sm:px-4 py-2 rounded-[20%] sm:rounded-full font-light text-sm transition-colors",
                   section === "swan"
                     ? "bg-[#2256A3] text-white shadow-lg"
-                    : "bg-transparent text-[#2256A3] hover:text-[#0d264c]"
+                    : "bg-transparent text-[#2256A3] hover:text-[#0d264c]",
                 )}
               >
                 หงส์
@@ -117,11 +108,11 @@ const CreateKratong: NextPage<CreateKratongProps> = ({ selected, setSelected, ne
                 onClick={() => {
                   setSection("candles");
                 }}
-                className={classnames(
+                className={clsx(
                   "px-2 sm:px-4 py-2 rounded-[20%] sm:rounded-full font-light text-sm transition-colors",
                   section === "candles"
                     ? "bg-[#2256A3] text-white shadow-lg"
-                    : "bg-transparent text-[#2256A3] hover:text-[#0d264c]"
+                    : "bg-transparent text-[#2256A3] hover:text-[#0d264c]",
                 )}
               >
                 เทียน
@@ -130,11 +121,11 @@ const CreateKratong: NextPage<CreateKratongProps> = ({ selected, setSelected, ne
                 onClick={() => {
                   setSection("decorations");
                 }}
-                className={classnames(
+                className={clsx(
                   "px-2 sm:px-6 py-2 rounded-[20%] sm:rounded-full font-light text-sm transition-colors",
                   section === "decorations"
                     ? "bg-[#2256A3] text-white shadow-lg"
-                    : "bg-transparent text-[#2256A3] hover:text-[#0d264c]"
+                    : "bg-transparent text-[#2256A3] hover:text-[#0d264c]",
                 )}
               >
                 ของตกแต่ง
@@ -159,7 +150,6 @@ const CreateKratong: NextPage<CreateKratongProps> = ({ selected, setSelected, ne
   );
 };
 
-
 interface CreateWishProps {
   selected: Selected;
   wish: Wish;
@@ -173,7 +163,7 @@ interface WishError {
   content: string[] | null;
 }
 
-const CreateWish: NextPage<CreateWishProps> = ({ selected, wish, setWish, nextPage, prevPage }) => {
+const CreateWish = ({ selected, wish, setWish, nextPage, prevPage }: CreateWishProps) => {
   const CharLimits = {
     name: 64,
     content: 280,
@@ -182,8 +172,8 @@ const CreateWish: NextPage<CreateWishProps> = ({ selected, wish, setWish, nextPa
   const [error, setError] = useState<WishError>({ name: null, content: null });
 
   const validateValues = () => {
-    let nameErrors = [];
-    let contentErrors = [];
+    const nameErrors: string[] = [];
+    const contentErrors: string[] = [];
 
     if (wish.name.length === 0) nameErrors.push("โปรดกรอกข้อมูลดังกล่าว");
     if (wish.content.length === 0) contentErrors.push("โปรดกรอกข้อมูลดังกล่าว");
@@ -204,7 +194,7 @@ const CreateWish: NextPage<CreateWishProps> = ({ selected, wish, setWish, nextPa
   return (
     <>
       <div className="flex items-center fixed min-h-screen w-full top-0 z-20 px-10 font-ui">
-        <div className="flex flex-col border border-white bg-white bg-opacity-20 backdrop-blur-lg max-w-[525px] w-full mx-auto rounded-[34px]">
+        <div className="flex flex-col border border-white bg-white/20 max-w-[525px] w-full mx-auto rounded-[34px]">
           <div className="h-full pt-8 pb-4 sm:pb-2 w-full">
             <h1 className="text-white text-2xl text-center mb-0 sm:mb-1">ใส่คำอธิษฐาน</h1>
             <div className="flex flex-col items-center">
@@ -224,7 +214,7 @@ const CreateWish: NextPage<CreateWishProps> = ({ selected, wish, setWish, nextPa
               </svg>
             </div>
           </div>
-          <div className="flex flex-col relative z-10 justify-between border border-white bg-white bg-opacity-40 h-full rounded-[34px] w-full pb-2">
+          <div className="flex flex-col relative z-10 justify-between border border-white bg-white/40 h-full rounded-[34px] w-full pb-2">
             <div>
               <div className="flex flex-col space-y-2 justify-between w-full pt-6 px-4 sm:px-8 max-h-[209px] sm:max-h-[240px] mt-3 overflow-y-auto">
                 <div className="w-full">
@@ -244,7 +234,7 @@ const CreateWish: NextPage<CreateWishProps> = ({ selected, wish, setWish, nextPa
                         });
                       }}
                       value={wish.name}
-                      className="block w-full mt-2 bg-transparent placeholder-[#f1f1f1] text-[#fff] outline-none border-b-2 border-white px-2 pt-2 pb-1 mb-4"
+                      className="block w-full mt-2 bg-transparent placeholder:text-[#f1f1f1] text-[#fff] outline-hidden border-b-2 border-white px-2 pt-2 pb-1 mb-4"
                       placeholder="ผอ.วรรณดี นาคสุขปาน"
                     />
                   </fieldset>
@@ -271,7 +261,7 @@ const CreateWish: NextPage<CreateWishProps> = ({ selected, wish, setWish, nextPa
                         });
                       }}
                       value={wish.content ?? ""}
-                      className="block w-full mt-2 bg-transparent placeholder-[#eee] text-[#fdfdfd] outline-none border-b-2 border-white px-2 pt-2 pb-1  mb-4"
+                      className="block w-full mt-2 bg-transparent placeholder:text-[#eee] text-[#fdfdfd] outline-hidden border-b-2 border-white px-2 pt-2 pb-1  mb-4"
                       placeholder="ขอให้ได้นักเรียนเตรียมอุดมฯ มีความสุข ประสบความสำเร็จ สอบได้คะแนนดี ๆ สาธุ"
                     />
                   </fieldset>
@@ -287,7 +277,7 @@ const CreateWish: NextPage<CreateWishProps> = ({ selected, wish, setWish, nextPa
             </div>
             <div className="flex justify-end space-x-2 px-4">
               <button
-                className="flex items-center text-[12px] sm:text-md bg-transparent text-white border border-white px-6 py-2 space-x-1 rounded-full font-light"
+                className="flex items-center text-[12px] bg-transparent text-white border border-white px-6 py-2 space-x-1 rounded-full font-light"
                 onClick={() => prevPage()}
               >
                 <ChevronLeftIcon className="w-5 h-5" />
@@ -295,7 +285,7 @@ const CreateWish: NextPage<CreateWishProps> = ({ selected, wish, setWish, nextPa
               </button>
 
               <button
-                className="flex items-center bg-[#2256A3] text-[12px] sm:text-md text-white px-6 py-2 rounded-full shadow-lg font-light"
+                className="flex items-center bg-[#2256A3] text-[12px] text-white px-6 py-2 rounded-full shadow-lg font-light"
                 onClick={() => {
                   if (!validateValues()) return;
 
@@ -316,34 +306,39 @@ import type { PrincipalResultData as ResultData } from "@types-app/kratong";
 export type { ResultData };
 
 interface ResultProps {
+  id: string;
   data: ResultData;
   prevPage: () => void;
 }
 
-const Result: NextPage<ResultProps> = ({ data, prevPage }) => {
-  const router = useRouter();
+const Result = ({ id, data, prevPage }: ResultProps) => {
+  const started = useRef(false);
 
-  const send = async (query: any) => {
-    if (query) {
-      const res = await sendDataContext.call({ id: query.id, data: data });
-      if (res) {
-        if (!res.status) {
-          send(query);
-        }
-      } else {
-        send(query);
-      }
-    }
-  };
-
+  // Submit once per mount, with at most 3 attempts and a growing delay.
+  // The ref guard keeps React Strict Mode's double effect from double-submitting.
   useEffect(() => {
-    send(router.query);
-  }, [router]);
+    if (started.current) return;
+    started.current = true;
+
+    const send = async () => {
+      for (let attempt = 0; attempt < 3; attempt++) {
+        try {
+          const res = await sendData({ id, data });
+          if (res?.status) return;
+        } catch {
+          // fall through to retry
+        }
+        if (attempt < 2) await new Promise((r) => setTimeout(r, 1000 * 2 ** attempt));
+      }
+    };
+
+    send();
+  }, [id, data]);
 
   return (
     <>
       <div className="flex items-center fixed min-h-screen w-full top-0 z-20 px-10 font-ui">
-        <div className="flex flex-col justify-center items-center space-y-6 border border-white bg-white bg-opacity-20 backdrop-blur-lg h-[80vh] max-h-[650px] max-w-[525px] w-full mx-auto rounded-[34px]">
+        <div className="flex flex-col justify-center items-center space-y-6 border border-white bg-white/20 h-[80vh] max-h-[650px] max-w-[525px] w-full mx-auto rounded-[34px]">
           <div className="pt-8 pb-4 sm:pb-2 w-full">
             <h1 className="text-white text-2xl text-center mb-8">สำเร็จ</h1>
             <p className="text-white font-light text-lg text-center mb-2">{data.wish.name}:</p>
@@ -367,7 +362,7 @@ const Result: NextPage<ResultProps> = ({ data, prevPage }) => {
           </div>
           <div className="justify-self-end flex justify-end space-x-2 px-4">
             <button
-              className="relative z-40 flex items-center text-md bg-white text-[#2256A3] border border-white px-6 py-2 space-x-1 rounded-full font-light"
+              className="relative z-40 flex items-center bg-white text-[#2256A3] border border-white px-6 py-2 space-x-1 rounded-full font-light"
               onClick={() => prevPage()}
             >
               <ChevronLeftIcon className="w-5 h-5" />
@@ -383,7 +378,7 @@ const Result: NextPage<ResultProps> = ({ data, prevPage }) => {
 import type { PrincipalResultData as KratongData } from "@types-app/kratong";
 export type { KratongData };
 
-export const Create: NextPage<{ idata: KratongData }> = ({ idata }) => {
+export const Create = ({ id, idata }: { id: string; idata: KratongData }) => {
   const [data, setData] = useState<KratongData>(
     Object.keys(idata).length > 1
       ? idata
@@ -398,7 +393,7 @@ export const Create: NextPage<{ idata: KratongData }> = ({ idata }) => {
             name: "ผอ.วรรณดี นาคสุขปาน",
             content: "",
           },
-        }
+        },
   );
 
   const [page, setPage] = useState(1);
@@ -441,7 +436,7 @@ export const Create: NextPage<{ idata: KratongData }> = ({ idata }) => {
           prevPage={PrevPage}
         />
       )}
-      {page === 3 && <Result data={data} prevPage={PrevPage} />}
+      {page === 3 && <Result id={id} data={data} prevPage={PrevPage} />}
     </>
   );
 };

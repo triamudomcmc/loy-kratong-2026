@@ -1,13 +1,10 @@
-import type { NextPage } from "next";
 import TitleScreen from "./title";
-import styles from "@styles/modules/Background.module.scss";
-import classNames from "classnames";
 
-export const Story: NextPage = () => {
+export function Story() {
   return (
     <>
-      <div className={classNames("z-[-50]", styles["story-scene"])}></div>
+      <div className="z-[-50] absolute w-screen h-screen bg-[linear-gradient(182.71deg,#281981_-2.41%,#3a71b3_47.53%,#1a3270_100.68%)]"></div>
       <TitleScreen />
     </>
   );
-};
+}

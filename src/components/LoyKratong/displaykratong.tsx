@@ -1,26 +1,31 @@
-import { KratongData, KratongData as NKratongData, Selected as NSelected, Wish } from "@components/Kratong/create";
-import type { NextPage } from "next";
+"use client";
+
+import type {
+  CupsaaKratongData as CKratongData,
+  KratongData,
+  KratongData as NKratongData,
+  PrincipalKratongData as PKratongData,
+  Wish,
+} from "@types-app/kratong";
 import { CUPSAAMap, KratongMap, PrincipalMap } from "@map/kratong";
-import styles from "@styles/modules/Kratong.module.scss";
-import pstyles from "@styles/modules/Principal.module.scss";
-import cstyles from "@styles/modules/CUPSAA.module.scss";
+import { cupsaaCls, kratongCls, principalCls } from "@components/kratong-classes";
 import { Candle, NormalPart, VariantPart } from "@components/Kratong/parts";
-import classNames from "classnames";
-import { AnimatePresence, motion } from "framer-motion";
-import { FC, useEffect, useMemo, useState } from "react";
+import clsx from "clsx";
+import { AnimatePresence, motion, type Transition } from "motion/react";
+import { FC, useEffect, useState } from "react";
 import { useWindowDimensions } from "@utils/useWindowDimensions";
 import { WaterFourData } from "@map/animations";
-import { XIcon } from "@heroicons/react/solid";
-import { KratongData as PKratongData } from "@components/Principal/create";
+import { XMarkIcon } from "@heroicons/react/24/solid";
 import { PrincipalPart } from "@components/Principal/parts";
 import { useAnimationFrame } from "@utils/useAnimationFrame";
 import { random } from "@utils/random";
-import { KratongData as CKratongData } from "@components/CUPSAA/create";
 import { CUPSAAPart } from "@components/CUPSAA/parts";
+
+const waterTransition = WaterFourData.transition as Transition;
 
 const DisplayName: FC<{ name: string }> = ({ name }) => {
   return (
-    <span className="absolute w-[150%] left-1/2 -translate-x-1/2 text-white z-[99] text-xs sm:text-sm top-[-29px] text-center font-light font-ui">
+    <span className="absolute w-[150%] left-1/2 text-white z-[99] text-xs sm:text-sm top-[-29px] text-center font-light font-ui">
       {name}
     </span>
   );
@@ -38,12 +43,12 @@ export const KratongPopup: FC<{
         exit={{ y: -100, opacity: 0 }}
         className="w-[275px] absolute z-[999] left-[63px] top-[-165px]"
       >
-        <div className="bg-white bg-opacity-30 backdrop-filter backdrop-blur-sm w-[270px] h-[180px] rounded-xl" />
-        <XIcon
+        <div className="bg-white/30 backdrop-blur-xs w-[270px] h-[180px] rounded-xl" />
+        <XMarkIcon
           className="w-5 h-5 text-white absolute z-[99] right-4 top-4 cursor-pointer hover:text-gray-100"
           onClick={() => onToggle(false)}
         />
-        <div className="absolute z-[98] top-0 left-0 py-6 px-6 flex flex-col min-w-1/4">
+        <div className="absolute z-[98] top-0 left-0 py-6 px-6 flex flex-col">
           <p className="font-ui font-medium text-white mb-2 pr-4">{info.name}</p>
           <hr className="w-1/2 border-[0.5px] border-white mb-4" />
           <p className="font-ui text-sm font-light text-white">{info.content}</p>
@@ -137,8 +142,6 @@ interface KratongProps {
 
 export const DisplayKratong: FC<KratongProps> = ({ data, height, zIndex, onClick, highlighted = false }) => {
   const selected = data.kratong;
-  const { width } = useWindowDimensions();
-  const [toggle, setToggle] = useState(false);
   const [hovered, setHovered] = useState(false);
 
   return (
@@ -148,14 +151,14 @@ export const DisplayKratong: FC<KratongProps> = ({ data, height, zIndex, onClick
         onMouseLeave={() => setHovered(false)}
         onClick={() => onClick()}
         style={{ ["--size" as string]: height, ["--z-index" as string]: zIndex }}
-        className={classNames(styles["kratong"], "cursor-pointer")}
+        className={clsx(kratongCls.root, "cursor-pointer")}
       >
-        {highlighted ? <div className={styles["aura"]}></div> : hovered && <div className={styles["aura"]}></div>}
+        {highlighted ? <div className={kratongCls.aura}></div> : hovered && <div className={kratongCls.aura}></div>}
         <DisplayName name={data.wish.name} />
-        <div className={styles["topping"]}>
-          <div className={styles["decorations"]}>
+        <div className={kratongCls.topping}>
+          <div className={kratongCls.decorations}>
             {Object.keys(KratongMap.decorations).map((decoration: string) => {
-              // @ts-ignore
+              // @ts-expect-error -- map is indexed by a runtime string key
               const part = KratongMap.decorations[decoration];
               if (part.type === "normal")
                 return <NormalPart key={decoration} part={part} selected={selected.decorations} />;
@@ -170,18 +173,18 @@ export const DisplayKratong: FC<KratongProps> = ({ data, height, zIndex, onClick
                 );
             })}
           </div>
-          <div className={styles["candle"]}>
+          <div className={kratongCls.candle}>
             {Object.keys(KratongMap.candles).map((candle: string) => {
-              // @ts-ignore
+              // @ts-expect-error -- map is indexed by a runtime string key
               const part = KratongMap.candles[candle];
               return <Candle key={candle} part={part} selected={selected.candles} />;
             })}
           </div>
         </div>
-        <div className={styles["base"]}>
-          <div className={styles["flowers"]}>
+        <div className={kratongCls.base}>
+          <div className={kratongCls.flowers}>
             {Object.keys(KratongMap.flowers).map((flower: string) => {
-              // @ts-ignore
+              // @ts-expect-error -- map is indexed by a runtime string key
               const part = KratongMap.flowers[flower];
               if (part.type === "normal") return <NormalPart key={flower} part={part} selected={selected.flowers} />;
               else if (part.type === "variant")
@@ -195,12 +198,12 @@ export const DisplayKratong: FC<KratongProps> = ({ data, height, zIndex, onClick
                 );
             })}
           </div>
-          <div className={styles["shell"]}>
+          <div className={kratongCls.shell}>
             {Object.keys(KratongMap.base).map((base: string) => {
-              // @ts-ignore
+              // @ts-expect-error -- map is indexed by a runtime string key
               const part = KratongMap.base[base];
               if (part.type === "normal") {
-                // @ts-ignore
+                // @ts-expect-error -- map is indexed by a runtime string key
                 return <NormalPart key={base} part={KratongMap.base[base]} selected={selected.base} />;
               } else if (part.type === "variant")
                 return (
@@ -214,7 +217,7 @@ export const DisplayKratong: FC<KratongProps> = ({ data, height, zIndex, onClick
   );
 };
 
-export const CUPSAAIdleKratong: NextPage<{
+export const CUPSAAIdleKratong: FC<{
   data: CKratongData;
   className?: string;
   size: Array<string>;
@@ -225,55 +228,53 @@ export const CUPSAAIdleKratong: NextPage<{
   const { width } = useWindowDimensions();
   const selected = data.kratong;
   const zIndex = lane === "t" ? 19 : lane === "m" ? 29 : 39;
-  const textZIndex = lane === "t" ? 15 : lane === "m" ? 25 : 35;
   const [toggle, setToggle] = useState(false);
   const height = width > 640 ? size[0] : size[1];
 
   return (
     <motion.div
       animate={WaterFourData.animate}
-      transition={WaterFourData.transition}
+      transition={waterTransition}
       style={{ left: initialX, zIndex: zIndex }}
       className="relative"
     >
       <div className={className} style={{ zIndex }}>
-        {toggle && (
-          <AnimatePresence>
-            <KratongPopup info={data.wish} onToggle={setToggle} />
-          </AnimatePresence>
-        )}
+        <AnimatePresence>
+          {toggle && <KratongPopup key="popup" info={data.wish} onToggle={setToggle} />}
+        </AnimatePresence>
         <div
           onClick={() => setToggle(!toggle)}
           style={{ ["--size" as string]: height, ["--z-index" as string]: zIndex }}
-          className={classNames(cstyles["kratong"], "cursor-pointer")}
+          className={clsx(cupsaaCls.root, "cursor-pointer")}
         >
-          {highlighted && <div className={styles["aura"]}></div>}
+          {highlighted && <div className={kratongCls.aura}></div>}
           <DisplayName name={data.wish.name} />
-          <div className={cstyles["topping"]}>
-            <div className={cstyles["logo"]}>
-              <div className={cstyles["container"]}>
-                <img className={cstyles["img"]} src="/assets/images/CUPSAA/logo.png" alt="CUPSAA Logo" />
+          <div className={cupsaaCls.topping}>
+            <div className={cupsaaCls.logo}>
+              <div>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/assets/images/CUPSAA/logo.png" alt="CUPSAA Logo" />
               </div>
             </div>
-            <div className={cstyles["candle"]}>
+            <div className={cupsaaCls.candle}>
               {Object.keys(CUPSAAMap.candles).map((candle: string) => {
-                // @ts-ignore
+                // @ts-expect-error -- map is indexed by a runtime string key
                 const part = CUPSAAMap.candles[candle];
                 return <CUPSAAPart key={candle} part={part} selected={selected.candles} />;
               })}
             </div>
           </div>
-          <div className={cstyles["base"]}>
-            <div className={cstyles["flowers"]}>
+          <div className={cupsaaCls.base}>
+            <div className={cupsaaCls.flowers}>
               {Object.keys(CUPSAAMap.flowers).map((flower: string) => {
-                // @ts-ignore
+                // @ts-expect-error -- map is indexed by a runtime string key
                 const part = CUPSAAMap.flowers[flower];
                 return <CUPSAAPart key={flower} part={part} selected={selected.flowers} />;
               })}
             </div>
-            <div className={cstyles["shell"]}>
+            <div className={cupsaaCls.shell}>
               {Object.keys(CUPSAAMap.base).map((base: string) => {
-                // @ts-ignore
+                // @ts-expect-error -- map is indexed by a runtime string key
                 const part = CUPSAAMap.base[base];
                 return <CUPSAAPart key={base} part={part} selected={selected.base} />;
               })}
@@ -285,7 +286,7 @@ export const CUPSAAIdleKratong: NextPage<{
   );
 };
 
-export const PrincipalIdleKratong: NextPage<{
+export const PrincipalIdleKratong: FC<{
   data: PKratongData;
   className?: string;
   size: Array<string>;
@@ -296,7 +297,6 @@ export const PrincipalIdleKratong: NextPage<{
   const [toggle, setToggle] = useState(false);
 
   const zIndex = lane === "t" ? 15 : lane === "m" ? 25 : 35;
-  const textZIndex = lane === "t" ? 15 : lane === "m" ? 25 : 35;
 
   const selected = data.kratong;
   const height = width > 640 ? size[0] : size[1];
@@ -305,51 +305,49 @@ export const PrincipalIdleKratong: NextPage<{
     <>
       <motion.div
         animate={WaterFourData.animate}
-        transition={WaterFourData.transition}
+        transition={waterTransition}
         style={{ left: initialX, zIndex: zIndex + 6 }}
         className="relative"
       >
         <div className={className} style={{ zIndex }}>
-          {toggle && (
-            <AnimatePresence>
-              <KratongPopup info={data.wish} onToggle={setToggle} />
-            </AnimatePresence>
-          )}
+          <AnimatePresence>
+            {toggle && <KratongPopup key="popup" info={data.wish} onToggle={setToggle} />}
+          </AnimatePresence>
           <div
             onClick={() => setToggle(!toggle)}
             style={{ ["--size" as string]: height, ["--z-index" as string]: zIndex }}
-            className={classNames(pstyles["kratong"], "cursor-pointer")}
+            className={clsx(principalCls.root, "cursor-pointer")}
           >
-            {<div className={pstyles["aura"]}></div>}
+            {<div className={principalCls.aura}></div>}
             <DisplayName name={data.wish.name} />
-            <div className={pstyles["topping"]}>
-              <div className={pstyles["decorations"]}>
+            <div className={principalCls.topping}>
+              <div className={principalCls.decorations}>
                 {Object.keys(PrincipalMap.decorations).map((decoration: string) => {
-                  // @ts-ignore
+                  // @ts-expect-error -- map is indexed by a runtime string key
                   const part = PrincipalMap.decorations[decoration];
                   return <PrincipalPart key={decoration} part={part} selected={selected.decorations} />;
                 })}
               </div>
-              <div className={pstyles["candle"]}>
+              <div className={principalCls.candle}>
                 {Object.keys(PrincipalMap.candles).map((candle: string) => {
-                  // @ts-ignore
+                  // @ts-expect-error -- map is indexed by a runtime string key
                   const part = PrincipalMap.candles[candle];
                   return <PrincipalPart key={candle} part={part} selected={selected.candles} />;
                 })}
               </div>
             </div>
-            <div className={pstyles["base"]}>
-              <div className={pstyles["swan"]}>
+            <div className={principalCls.base}>
+              <div className={principalCls.swan}>
                 {Object.keys(PrincipalMap.swan).map((swan: string) => {
-                  // @ts-ignore
+                  // @ts-expect-error -- map is indexed by a runtime string key
                   const part = PrincipalMap.swan[swan];
                   return <PrincipalPart key={swan} part={part} selected={selected.swan} />;
                 })}
               </div>
               {/* changeme */}
-              <div className={pstyles["shell"]}>
+              <div className={principalCls.shell}>
                 {Object.keys(PrincipalMap.base).map((base: string) => {
-                  // @ts-ignore
+                  // @ts-expect-error -- map is indexed by a runtime string key
                   const part = PrincipalMap.base[base];
                   return <PrincipalPart key={base} part={part} selected={selected.base} />;
                 })}
@@ -365,7 +363,7 @@ export const PrincipalIdleKratong: NextPage<{
   );
 };
 
-export const IdleKratong: NextPage<{
+export const IdleKratong: FC<{
   data: NKratongData;
   className?: string;
   size: Array<string>;
@@ -373,26 +371,23 @@ export const IdleKratong: NextPage<{
   initialX: number;
   highlighted: boolean;
 }> = ({ className, data, size, lane, initialX, highlighted }) => {
-  const { width, height } = useWindowDimensions();
+  const { width } = useWindowDimensions();
   const [toggle, setToggle] = useState(false);
 
   const zIndex = lane === "t" ? 19 : lane === "m" ? 29 : 39;
-  const textZIndex = lane === "t" ? 15 : lane === "m" ? 25 : 35;
 
   return (
     <>
       <motion.div
         animate={WaterFourData.animate}
-        transition={WaterFourData.transition}
+        transition={waterTransition}
         style={{ left: initialX, zIndex }}
         className={className}
       >
         <div style={{ zIndex }}>
-          {toggle && (
-            <AnimatePresence>
-              <KratongPopup info={data.wish} onToggle={setToggle} />
-            </AnimatePresence>
-          )}
+          <AnimatePresence>
+            {toggle && <KratongPopup key="popup" info={data.wish} onToggle={setToggle} />}
+          </AnimatePresence>
           <DisplayKratong
             height={width > 640 ? size[0] : size[1]}
             zIndex={zIndex}
@@ -417,7 +412,7 @@ interface DrKratongProps {
   setLoy: (a: boolean) => void;
 }
 
-export const DraggableKratong: NextPage<DrKratongProps> = ({ className, data, height, zIndex, setLoy }) => {
+export const DraggableKratong: FC<DrKratongProps> = ({ className, data, height, zIndex, setLoy }) => {
   const { width } = useWindowDimensions();
   const [finished, setFinished] = useState(false);
   const [x, setX] = useState(112);
@@ -439,7 +434,7 @@ export const DraggableKratong: NextPage<DrKratongProps> = ({ className, data, he
       // delta - time elapsed in ms
       setX((prevX) => (prevX < width + 1800 ? prevX + delta * 0.01 * speedX : prevX - (random(20, 200) + 1840)));
     },
-    (delta: number) => {
+    () => {
       return false;
     },
     finished
@@ -450,13 +445,13 @@ export const DraggableKratong: NextPage<DrKratongProps> = ({ className, data, he
       setLoy(true);
       localStorage.setItem("released", "true");
     }
-  }, [finished]);
+  }, [finished, setLoy]);
 
   const elementProps = () => {
     if (finished) {
       return {
         animate: WaterFourData.animate,
-        transition: WaterFourData.transition,
+        transition: waterTransition,
       };
     } else {
       return {};
@@ -471,7 +466,7 @@ export const DraggableKratong: NextPage<DrKratongProps> = ({ className, data, he
         top: `${!finished ? (width > 640 ? -166 : -116) : width > 640 ? -142 : -60}px`,
         left: `${x}px`,
       }}
-      className={classNames("absolute", className)}
+      className={clsx("absolute", className)}
     >
       <motion.div
         drag={!finished}
@@ -494,14 +489,14 @@ export const DraggableKratong: NextPage<DrKratongProps> = ({ className, data, he
           ["--z-index" as string]: finished ? zIndex : 35,
           zIndex: finished ? zIndex[1] : zIndex[0],
         }}
-        className={classNames(styles["kratong"])}
+        className={clsx(kratongCls.root)}
       >
         {data?.wish && <DisplayName name={data.wish.name} />}
-        {hover && <div className={styles["aura"]}></div>}
-        <div className={styles["topping"]}>
-          <div className={styles["decorations"]}>
+        {hover && <div className={kratongCls.aura}></div>}
+        <div className={kratongCls.topping}>
+          <div className={kratongCls.decorations}>
             {Object.keys(KratongMap.decorations).map((decoration: string) => {
-              // @ts-ignore
+              // @ts-expect-error -- map is indexed by a runtime string key
               const part = KratongMap.decorations[decoration];
               if (part.type === "normal")
                 return <NormalPart key={decoration} part={part} selected={selected.decorations} />;
@@ -516,18 +511,18 @@ export const DraggableKratong: NextPage<DrKratongProps> = ({ className, data, he
                 );
             })}
           </div>
-          <div className={styles["candle"]}>
+          <div className={kratongCls.candle}>
             {Object.keys(KratongMap.candles).map((candle: string) => {
-              // @ts-ignore
+              // @ts-expect-error -- map is indexed by a runtime string key
               const part = KratongMap.candles[candle];
               return <Candle key={candle} part={part} selected={selected.candles} />;
             })}
           </div>
         </div>
-        <div className={styles["base"]}>
-          <div className={styles["flowers"]}>
+        <div className={kratongCls.base}>
+          <div className={kratongCls.flowers}>
             {Object.keys(KratongMap.flowers).map((flower: string) => {
-              // @ts-ignore
+              // @ts-expect-error -- map is indexed by a runtime string key
               const part = KratongMap.flowers[flower];
               if (part.type === "normal") return <NormalPart key={flower} part={part} selected={selected.flowers} />;
               else if (part.type === "variant")
@@ -541,12 +536,12 @@ export const DraggableKratong: NextPage<DrKratongProps> = ({ className, data, he
                 );
             })}
           </div>
-          <div className={styles["shell"]}>
+          <div className={kratongCls.shell}>
             {Object.keys(KratongMap.base).map((base: string) => {
-              // @ts-ignore
+              // @ts-expect-error -- map is indexed by a runtime string key
               const part = KratongMap.base[base];
               if (part.type === "normal") {
-                // @ts-ignore
+                // @ts-expect-error -- map is indexed by a runtime string key
                 return <NormalPart key={base} part={KratongMap.base[base]} selected={selected.base} />;
               } else if (part.type === "variant")
                 return (

@@ -1,6 +1,6 @@
-import type { NextPage } from "next";
+import type { FC } from "react";
 
-const LightWater: NextPage = () => {
+const LightWater: FC = () => {
   return (
     <svg
       width="2957"

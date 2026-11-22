@@ -19,8 +19,7 @@
       "@utils/*": ["./src/utils/*"],
       "@map/*": ["./src/map/*"],
       "@server/*": ["./src/server/*"],
-      "@types-app/*": ["./src/types/*"],
-      "@styles/*": ["./src/styles/*"]
+      "@types-app/*": ["./src/types/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", ".next/dev/types/**/*.ts"],

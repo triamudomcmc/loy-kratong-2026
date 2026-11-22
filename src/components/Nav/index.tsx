@@ -1,34 +1,34 @@
-import { ResultData } from "@components/Kratong/create";
-import { DownloadIcon } from "@heroicons/react/solid";
-import type { NextPage } from "next";
+"use client";
+
+import type { ResultData } from "@types-app/kratong";
+import { ArrowDownTrayIcon, ArrowLeftIcon } from "@heroicons/react/24/solid";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { ArrowLeftIcon } from "@heroicons/react/outline";
-import Router from "next/router";
+import { useRouter } from "next/navigation";
 
-const InApp = require("detect-inapp");
-
-export const Navbar: NextPage = () => {
+export function Navbar() {
   return (
     <header className="flex w-full px-6 py-6 fixed top-0 left-0 z-[99]">
       <nav className="max-w-[124px]">
-        <Image src="/assets/images/logo.png" width="1024px" height="169px" alt="โลโก้ กช." />
+        <Image src="/assets/images/logo.png" width={1024} height={169} alt="โลโก้ กช." />
       </nav>
     </header>
   );
-};
+}
 
-export const NavLoy: NextPage = () => {
+export function NavLoy() {
+  const router = useRouter();
   const [waiting, setWaiting] = useState(false);
   const [prevEntity, setPrevEntity] = useState<undefined | ResultData>(undefined);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- localStorage is only available after mount
     setPrevEntity(JSON.parse(localStorage.getItem("entity") || "{}"));
   }, []);
 
   const onClick = async () => {
     if (!prevEntity || waiting) return;
-    const imgUrl = `/api/capture?data=${JSON.stringify(prevEntity)}`;
+    const imgUrl = `/api/capture?data=${encodeURIComponent(JSON.stringify(prevEntity))}`;
 
     setWaiting(true);
 
@@ -41,6 +41,7 @@ export const NavLoy: NextPage = () => {
     });
 
     if (res.ok) {
+      const { default: InApp } = await import("detect-inapp");
       const inapp = new InApp(navigator.userAgent || navigator.vendor);
       if (inapp.browser === "line" || inapp.browser === "messenger" || inapp.browser === "facebook") {
         const a = document.createElement("a");
@@ -67,7 +68,7 @@ export const NavLoy: NextPage = () => {
     localStorage.removeItem("entityId");
     localStorage.removeItem("released");
 
-    Router.push("/create");
+    router.push("/create");
   };
 
   return (
@@ -78,15 +79,15 @@ export const NavLoy: NextPage = () => {
         </h1>
       </div>
       <nav className="max-w-[124px]">
-        <Image src="/assets/images/logo.png" width="1024px" height="169px" alt="โลโก้ กช." />
+        <Image src="/assets/images/logo.png" width={1024} height={169} alt="โลโก้ กช." />
       </nav>
       <div
         onClick={onClick}
         className="flex text-[12px] cursor-pointer sm:text-sm hover:bg-gray-600 transition-colors rounded-full border text-white border-white bg-[#051018] px-6 py-2 space-x-1 font-light"
       >
-        <DownloadIcon className="sm:w-5 sm:h-5 h-4 w-4" />
+        <ArrowDownTrayIcon className="sm:w-5 sm:h-5 h-4 w-4" />
         <span className="font-ui">{waiting ? "กำลังโหลด..." : "บันทึกภาพกระทง"}</span>
       </div>
     </header>
   );
-};
+}

@@ -1,27 +1,29 @@
-import type { NextPage } from "next";
+"use client";
+
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "motion/react";
 import { Cloud } from "@components/Vector/cloud";
-import classNames from "classnames";
+import clsx from "clsx";
 import { PageFive, PageFour, PageOne, PageThree, PageTwo } from "./pages";
 import { useWindowDimensions } from "@utils/useWindowDimensions";
 
 const DURATION = 500;
 const DELAY = 650;
 
-const TitleScreen: NextPage = () => {
+export default function TitleScreen() {
   const [page, setPage] = useState(1);
   const [pageTransition, setPageTransition] = useState(false);
-  const { width, height } = useWindowDimensions();
+  const { width } = useWindowDimensions();
 
   useEffect(() => {
     if (!pageTransition) return;
-    setTimeout(() => {
+    const timeout = setTimeout(() => {
       setPage(page + 1);
       setPageTransition(false);
     }, DURATION + DELAY);
-  }, [pageTransition]);
+    return () => clearTimeout(timeout);
+  }, [pageTransition, page]);
 
   const nextPage = () => {
     setPageTransition(true);
@@ -43,7 +45,7 @@ const TitleScreen: NextPage = () => {
   return (
     <>
       <div
-        className={classNames(
+        className={clsx(
           "flex items-center justify-center fixed w-full h-screen font-ui text-white",
           page < 4 && "cursor-pointer"
         )}
@@ -170,24 +172,22 @@ const TitleScreen: NextPage = () => {
               duration: DURATION / 1000,
             }}
           >
-            <div className="absolute w-[65%] left-[50%] z-[-1] top-[50%] -translate-x-1/2 -translate-y-1/2">
-              <Image src="/assets/images/scene/moon.gif" width={2048} height={2048} objectFit="cover" alt="ดวงจันทร์" />
+            <div className="absolute w-[65%] left-[50%] z-[-1] top-[50%]">
+              <Image src="/assets/images/scene/moon.gif" width={2048} height={2048} className="object-cover" alt="ดวงจันทร์" />
             </div>
             <div className="absolute top-0 z-[-2]">
-              <Image src="/assets/images/scene/blur.png" width={3414} height={3414} objectFit="cover" alt="ดวงจันทร์" />
+              <Image src="/assets/images/scene/blur.png" width={3414} height={3414} className="object-cover" alt="ดวงจันทร์" />
             </div>
           </motion.div>
           <AnimatePresence>
-            {!pageTransition && page === 1 && <PageOne />}
-            {!pageTransition && page === 2 && <PageTwo />}
-            {!pageTransition && page === 3 && <PageThree />}
-            {!pageTransition && page === 4 && <PageFour nextPage={nextPage} />}
-            {!pageTransition && page === 5 && <PageFive />}
+            {!pageTransition && page === 1 && <PageOne key="page-1" />}
+            {!pageTransition && page === 2 && <PageTwo key="page-2" />}
+            {!pageTransition && page === 3 && <PageThree key="page-3" />}
+            {!pageTransition && page === 4 && <PageFour key="page-4" nextPage={nextPage} />}
+            {!pageTransition && page === 5 && <PageFive key="page-5" />}
           </AnimatePresence>
         </div>
       </div>
     </>
   );
-};
-
-export default TitleScreen;
+}
