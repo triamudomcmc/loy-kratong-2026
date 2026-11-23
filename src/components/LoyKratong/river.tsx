@@ -4,8 +4,7 @@ import type { CSSProperties, FC, ReactNode } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useAnimationControls, useReducedMotion } from "motion/react";
 import { WaterFourData, WaterOneData, WaterThreeData, WaterTwoData } from "@map/animations";
-import type { CupsaaKratongData, PrincipalKratongData, ResultData } from "@types-app/kratong";
-import { CUPSAAKratongData, PrincipalKratongData as PrincipalData, RongPrincipalKratongsData } from "@map/realkratong";
+import type { ResultData } from "@types-app/kratong";
 import { Layer, Moon, u } from "@components/ui";
 import { KratongArt, kindOf, type RiverData, type RiverKind } from "./art";
 import { POPUP_DX, POPUP_DY, WishPopup } from "./popup";
@@ -56,7 +55,6 @@ const isEntity = (d: unknown): d is ResultData =>
   !!d && typeof d === "object" && "kratong" in d && "wish" in d && !!(d as ResultData).kratong && !!(d as ResultData).wish;
 
 function buildItems(entities: ResultData[], own: ResultData | null): Item[] {
-  const rong = RongPrincipalKratongsData[Math.floor(Math.random() * RongPrincipalKratongsData.length)];
   const shuffled = shuffle(entities);
   const back: ResultData[] = [];
   const mid: ResultData[] = [];
@@ -84,17 +82,12 @@ function buildItems(entities: ResultData[], own: ResultData | null): Item[] {
   const frontList = [
     ...(own ? [{ id: "own", kind: kindOf(own), data: own, own: true }] : []),
     ...(!own && front.length ? [ent("f", front.shift() as ResultData, 0)] : []),
-    { id: "principal", kind: "principal" as const, data: PrincipalData as PrincipalKratongData, box: { top: 483, w: 352, h: 504 } },
     ...front.map((e, i) => ent("f", e, i + 1)),
   ];
 
   return [
     ...make("back", back.map((e, i) => ent("b", e, i))),
-    ...make("mid", [
-      { id: "rong", kind: "normal" as const, data: rong, box: { top: 479, w: 282, h: 296 } },
-      { id: "cupsaa", kind: "cupsaa" as const, data: CUPSAAKratongData as CupsaaKratongData, box: { top: 493, w: 263, h: 279 } },
-      ...mid.map((e, i) => ent("m", e, i)),
-    ]),
+    ...make("mid", mid.map((e, i) => ent("m", e, i))),
     ...make("front", frontList),
   ];
 }

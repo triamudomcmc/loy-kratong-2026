@@ -106,7 +106,7 @@ const CreateWish = ({ selected, wish, setWish, nextPage, prevPage }: CreateWishP
         label="ชื่อ"
         top={321}
         value={wish.name}
-        placeholder="ผอ.วรรณดี นาคสุขปาน"
+        placeholder="ชื่อ-นามสกุล"
         limit={CharLimits.name}
         error={error.name}
         errorTick={errorTick}
@@ -213,7 +213,7 @@ export const Create = ({ id, idata }: { id: string; idata: KratongData }) => {
             swan: "swan-blue",
           },
           wish: {
-            name: "ผอ.วรรณดี นาคสุขปาน",
+            name: "",
             content: "",
           },
         },
