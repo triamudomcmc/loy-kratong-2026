@@ -115,22 +115,23 @@ export const LEGACY_FLOWER: Record<string, FlowerId> = {
 export const FLOWER_TUNE: Partial<Record<BaseId, Partial<Record<FlowerId, { dy?: number; scale?: number }>>>> = {
   "green-lotus-large": {
     "pink-lotus": { dy: -16 }, // #2
-    "pink-blossom": { dy: -16 }, // #3
+    "pink-blossom": { dy: -24 }, // #3
     "purple-cream": { dy: 14 }, // #4
+    frangipani: { dy: -8 }, // #5
   },
   "green-lotus": {
-    "pink-lotus": { scale: 0.82, dy: -14 }, // #7
-    "pink-blossom": { scale: 0.82, dy: -14 }, // #8
+    "pink-lotus": { scale: 0.82, dy: -22 }, // #7
+    "pink-blossom": { scale: 0.82, dy: -22 }, // #8
     "purple-cream": { scale: 0.88, dy: 10 }, // #9
-    frangipani: { scale: 0.82, dy: -6 }, // #10
+    frangipani: { scale: 0.82, dy: -14 }, // #10
   },
   "blue-bowl": {
     "pink-blossom": { dy: -10 }, // #13
     "purple-cream": { dy: -12 }, // #14
   },
   "orange-lotus": {
-    "pink-blossom": { dy: 16 }, // #23
-    frangipani: { dy: 16 }, // #25
+    "pink-blossom": { dy: 8 }, // #23
+    frangipani: { dy: 8 }, // #25
   },
 };
 
