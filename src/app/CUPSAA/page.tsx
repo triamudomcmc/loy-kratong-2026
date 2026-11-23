@@ -1,5 +1,4 @@
 import { redirect } from "next/navigation";
-import { Navbar } from "@components/Nav";
 import { CUPSAAPage } from "@components/CUPSAA";
 import { getPorOarKratong } from "@server/queries";
 import type { CupsaaKratongData } from "@types-app/kratong";
@@ -17,9 +16,6 @@ export default async function Page({
   const data = ((await getPorOarKratong(id)) ?? {}) as CupsaaKratongData;
 
   return (
-    <>
-      <Navbar />
-      <CUPSAAPage id={id} data={data} />
-    </>
+    <CUPSAAPage id={id} data={data} />
   );
 }

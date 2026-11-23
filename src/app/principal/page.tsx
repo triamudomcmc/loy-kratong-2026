@@ -1,5 +1,4 @@
 import { redirect } from "next/navigation";
-import { Navbar } from "@components/Nav";
 import { PrincipalPage } from "@components/Principal";
 import { getPorOarKratong } from "@server/queries";
 import type { PrincipalKratongData } from "@types-app/kratong";
@@ -17,9 +16,6 @@ export default async function Page({
   const data = ((await getPorOarKratong(id)) ?? {}) as PrincipalKratongData;
 
   return (
-    <>
-      <Navbar />
-      <PrincipalPage id={id} data={data} />
-    </>
+    <PrincipalPage id={id} data={data} />
   );
 }

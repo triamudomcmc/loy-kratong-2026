@@ -1,18 +1,57 @@
 "use client";
 
 import type { FC } from "react";
-import { Fragment, useState } from "react";
+import { useState } from "react";
 import { Kratong } from "./kratong";
 import { KratongMap, KratongType, KratongTypeVariant } from "@map/kratong";
-import Image from "next/image";
-import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
-import clsx from "clsx";
-import { motion } from "motion/react";
 import { pushKratong } from "@server/actions";
 import { useRouter } from "next/navigation";
+import { u } from "@components/ui";
+import {
+  ActionButtons,
+  BuilderSheet,
+  BuilderShell,
+  BuilderStage,
+  NextButton,
+  ScrollArea,
+  SectionLabel,
+  SIGN_SWATCH_ORDER,
+  SwatchRow,
+  TabStrip,
+  TileGrid,
+  WishField,
+  lineName,
+  lineWish,
+} from "@components/ui/builder";
+import type { Tile } from "@components/ui/builder";
 
 import type { KratongSelected as Selected, Wish } from "@types-app/kratong";
 export type { Selected, Wish };
+
+type Part = "base" | "flowers" | "candles" | "decorations";
+
+const TABS: { id: Part; label: string }[] = [
+  { id: "base", label: "ฐาน" },
+  { id: "flowers", label: "ดอกไม้" },
+  { id: "candles", label: "เทียน" },
+  { id: "decorations", label: "ของตกแต่ง" },
+];
+
+type AnyPart = KratongType | KratongTypeVariant;
+
+const toTile = (data: AnyPart, signVariant: number): Tile => ({
+  id: data.id,
+  name: data.name,
+  src:
+    "url" in data
+      ? (data.thumbnail ?? data.url)
+      : (data.thumbnails ? data.thumbnails[signVariant] : data.variants[signVariant]),
+  wide: "variants" in data,
+});
+
+const PreviewKratong: FC<{ selected: Selected }> = ({ selected }) => (
+  <Kratong zIndex={7} height={u(117)} selected={selected} />
+);
 
 interface CreateKratongProps {
   selected: Selected;
@@ -20,208 +59,43 @@ interface CreateKratongProps {
   nextPage: () => void;
 }
 
-interface KratongTileProps {
-  part: "base" | "flowers" | "candles" | "decorations";
-  setSelected: (selection: Selected) => void;
-  selected: Selected;
-  data: KratongType | KratongTypeVariant;
-}
-
-const KratongTile: FC<KratongTileProps> = ({ part, setSelected, selected, data }) => {
-  return (
-    <>
-      <motion.div
-        key={`part_${data.id}`}
-        whileHover={{
-          scale: 1.05,
-          transition: { duration: 0.1 },
-        }}
-        whileTap={{ scale: 0.9 }}
-        onClick={() => {
-          setSelected({ ...selected, [part]: data.id });
-        }}
-        className={clsx(
-          "border-2 rounded-[20%] cursor-pointer bg-[#F5F5FB] transition-opacity bg-[#F5F5FB]/40 hover:bg-[#F5F5FB]/60",
-          selected[part] === data.id ? "border-white" : "border-transparent"
-        )}
-      >
-        <div className="flex flex-col items-center mt-[-4px] mx-[-6px]">
-          <Image
-            className="object-contain"
-            alt={data["name"]}
-            priority={true}
-            width={2388}
-            height={1668}
-            src={
-              "url" in data
-                ? data?.thumbnail ?? data.url
-                : data?.thumbnails
-                ? data.thumbnails[selected.signVariant]
-                : data.variants[selected.signVariant]
-            }
-          />
-          <span className="text-sm text-center text-[#726EA5] my-2 break-words w-full px-1">{data.name}</span>
-        </div>
-      </motion.div>
-    </>
-  );
-};
-
-const signColors = ["#c93139", "#ffa654", "#f38de5", "#ff97b2", "#5076e7", "#53f028"];
-
 const CreateKratong: FC<CreateKratongProps> = ({ selected, setSelected, nextPage }) => {
-  const [section, setSection] = useState<"base" | "flowers" | "candles" | "decorations">("base");
+  const [section, setSection] = useState<Part>("base");
 
-  const generate = (part: "base" | "flowers" | "candles" | "decorations") =>
-    (Object.values(KratongMap[part]) as (KratongType | KratongTypeVariant)[]).map((data, i) => (
-      <KratongTile key={i} selected={selected} setSelected={setSelected} data={data} part={part} />
-    ));
+  const parts = (part: Part) => Object.values(KratongMap[part]) as AnyPart[];
+  const select = (part: Part) => (id: string) => setSelected({ ...selected, [part]: id });
+  const tiles = (list: AnyPart[]) => list.map((d) => toTile(d, selected.signVariant));
 
-  const generateDecorations = (index: number) =>
-    (Object.values(KratongMap["decorations"]) as (KratongType | KratongTypeVariant)[])
-      .filter((data) => (index === 1 ? data.type === "variant" : data.type !== "variant"))
-      .map((data, i) => (
-        <KratongTile key={i} selected={selected} setSelected={setSelected} data={data} part={"decorations"} />
-      ));
+  const decorations = parts("decorations");
+  const signs = decorations.filter((d) => d.type === "variant");
+  const others = decorations.filter((d) => d.type !== "variant");
 
   return (
-    <div className="flex items-center fixed min-h-screen w-full top-0 z-20 px-10 font-ui">
-      <div className="flex flex-col border border-white bg-white/20 backdrop-blur-lg max-w-[525px] w-full mx-auto rounded-[34px]">
-        <div className="h-full pt-8 pb-4 sm:pb-2 w-full">
-          <h1 className="text-white text-2xl text-center mb-0 sm:mb-1">สร้างกระทง</h1>
-          <div className="flex flex-col items-center">
-            <div className="relative h-[150px] mb-[10px]">
-              <Kratong zIndex={7} height="150px" selected={selected} />
-            </div>
-            <svg className="w-[225px]" viewBox="0 0 370 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <ellipse
-                cx="184.709"
-                cy="20"
-                rx="184.5"
-                ry="20"
-                fill="white"
-                fillOpacity="0.3"
-                style={{ mixBlendMode: "soft-light" }}
-              />
-            </svg>
-          </div>
-        </div>
-        <div className="flex flex-col relative z-10 space-y-2 justify-between border border-white bg-white/40 h-full rounded-[34px] w-full pb-2">
-          <div className="space-y-6">
-            <div className="flex justify-center w-full mb-4 py-2 px-4 space-x-4 sm:space-x-6 rounded-t-[34px] bg-white/40">
-              <button
-                onClick={() => {
-                  setSection("base");
-                }}
-                className={clsx(
-                  "px-3 sm:px-8 py-2 rounded-[20%] sm:rounded-full font-light text-sm transition-colors",
-                  section === "base"
-                    ? "bg-[#2256A3] text-white shadow-lg"
-                    : "bg-transparent text-[#2256A3] hover:text-[#0d264c]"
-                )}
-              >
-                ฐาน
-              </button>
-              <button
-                onClick={() => {
-                  setSection("flowers");
-                }}
-                className={clsx(
-                  "px-2 sm:px-4 py-2 rounded-[20%] sm:rounded-full font-light text-sm transition-colors",
-                  section === "flowers"
-                    ? "bg-[#2256A3] text-white shadow-lg"
-                    : "bg-transparent text-[#2256A3] hover:text-[#0d264c]"
-                )}
-              >
-                ดอกไม้
-              </button>
-              <button
-                onClick={() => {
-                  setSection("candles");
-                }}
-                className={clsx(
-                  "px-2 sm:px-4 py-2 rounded-[20%] sm:rounded-full font-light text-sm transition-colors",
-                  section === "candles"
-                    ? "bg-[#2256A3] text-white shadow-lg"
-                    : "bg-transparent text-[#2256A3] hover:text-[#0d264c]"
-                )}
-              >
-                เทียน
-              </button>
-              <button
-                onClick={() => {
-                  setSection("decorations");
-                }}
-                className={clsx(
-                  "px-2 sm:px-6 py-2 rounded-[20%] sm:rounded-full font-light text-sm transition-colors",
-                  section === "decorations"
-                    ? "bg-[#2256A3] text-white shadow-lg"
-                    : "bg-transparent text-[#2256A3] hover:text-[#0d264c]"
-                )}
-              >
-                ของตกแต่ง
-              </button>
-            </div>
-          </div>
-          {section === "decorations" ? (
-            <div className="px-1 mx-1 sm:px-6 sm:mx-3 h-[112px] sm:h-[154px] overflow-y-auto">
-              <div>
-                <div className="mb-4">
-                  <p className="px-0 py-0 mb-2 text-xl text-[#293d5b]">ของตกแต่ง</p>
-                </div>
-                <div className="grid grid-cols-3 gap-4">{generateDecorations(0)}</div>
-
-                <div className="mt-6">
-                  <p className="px-0 py-0 mb-2 text-xl text-[#293d5b]">ป้าย</p>
-                  <div className="flex">
-                    {Array.from({ length: 6 }, (_, i) => i).map((i) => {
-                      return (
-                        <motion.div
-                          key={`col-${i}`}
-                          whileHover={{
-                            scale: 1.2,
-                            transition: { duration: 0.1 },
-                          }}
-                          whileTap={{ scale: 0.9 }}
-                          className={clsx(
-                            "p-4 mr-2 mb-6 rounded-full border border-white hover:opacity-90 cursor-pointer shadow-md",
-                            selected.signVariant === i ? "border-2 opacity-100" : "opacity-50"
-                          )}
-                          style={{ backgroundColor: signColors[i] }}
-                          onClick={() => {
-                            setSelected({
-                              ...selected,
-                              signVariant: i,
-                            });
-                          }}
-                        ></motion.div>
-                      );
-                    })}
-                  </div>
-                </div>
-                <div className="grid grid-cols-3 gap-4">{generateDecorations(1)}</div>
-              </div>
-            </div>
-          ) : (
-            <div className="grid grid-cols-3 gap-4 px-1 mx-1 sm:px-6 sm:mx-3 h-[112px] sm:h-[154px] overflow-y-auto">
-              {generate(section)}
-            </div>
-          )}
-          <div className="flex justify-end px-4 mt-1">
-            <button
-              className="flex items-center text-[12px] bg-[#2256A3] text-white px-6 py-2 space-x-1 rounded-full font-light"
-              onClick={() => nextPage()}
-            >
-              <span>ถัดไป</span>
-              <ChevronRightIcon className="w-5 h-5" />
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
+    <BuilderStage title="สร้างกระทง" preview={<PreviewKratong selected={selected} />} previewKey={JSON.stringify(selected)}>
+      <BuilderSheet />
+      <TabStrip tabs={TABS} value={section} onChange={setSection} />
+      <ScrollArea key={section}>
+        {section === "decorations" ? (
+          <>
+            <SwatchRow
+              label="ป้าย"
+              value={selected.signVariant}
+              order={SIGN_SWATCH_ORDER}
+              onChange={(signVariant) => setSelected({ ...selected, signVariant })}
+            />
+            <TileGrid y={16} tiles={tiles(signs)} selectedId={selected.decorations} onSelect={select("decorations")} />
+            <div style={{ height: u(18) }} />
+            <SectionLabel>ของตกแต่ง</SectionLabel>
+            <TileGrid y={0} tiles={tiles(others)} selectedId={selected.decorations} onSelect={select("decorations")} />
+          </>
+        ) : (
+          <TileGrid tiles={tiles(parts(section))} selectedId={selected[section]} onSelect={select(section)} />
+        )}
+      </ScrollArea>
+      <NextButton onClick={nextPage} />
+    </BuilderStage>
   );
 };
-
 
 interface CreateWishProps {
   selected: Selected;
@@ -232,66 +106,55 @@ interface CreateWishProps {
 }
 
 interface WishError {
-  name: string[] | null;
-  content: string[] | null;
+  name: string | null;
+  content: string | null;
 }
 
-const CreateWish: FC<CreateWishProps> = ({ selected, wish, setWish, prevPage }) => {
-  const CharLimits = {
-    name: 64,
-    content: 280,
-  };
+const CharLimits = { name: 64, content: 280 };
 
+const CreateWish: FC<CreateWishProps> = ({ selected, wish, setWish, prevPage }) => {
   const router = useRouter();
 
-  const [error, setError] = useState<WishError>({ name: null, content: null });
+  const [error, setErrorState] = useState<WishError>({ name: null, content: null });
+  const [errorTick, setErrorTick] = useState(0);
+  const setError = (next: WishError) => {
+    setErrorState(next);
+    if (next.name || next.content) setErrorTick((t) => t + 1);
+  };
   const [loading, setLoading] = useState(false);
 
   const validateValues = () => {
-    const nameErrors: string[] = [];
-    const contentErrors: string[] = [];
-
-    if (wish.name.length === 0) nameErrors.push("โปรดกรอกข้อมูลดังกล่าว");
-    if (wish.content.length === 0) contentErrors.push("โปรดกรอกข้อมูลดังกล่าว");
-
-    setError({
-      name: nameErrors.length === 0 ? null : nameErrors,
-      content: contentErrors.length === 0 ? null : contentErrors,
-    });
-
-    return nameErrors.length === 0 && contentErrors.length === 0;
-  };
-
-  const formatError = (err: string[]) => {
-    if (err.length === 1) return err[0];
-    else return err.join(", ");
+    const next = {
+      name: wish.name.length === 0 ? "โปรดกรอกข้อมูลดังกล่าว" : null,
+      content: wish.content.length === 0 ? "โปรดกรอกข้อมูลดังกล่าว" : null,
+    };
+    setError(next);
+    return !next.name && !next.content;
   };
 
   const save = async () => {
     setLoading(true);
     const entityData = { kratong: selected, wish: wish };
-    const kratongData = await pushKratong({ data: entityData });
+    let kratongData: Awaited<ReturnType<typeof pushKratong>>;
+    try {
+      kratongData = await pushKratong({ data: entityData });
+    } catch {
+      setError({ name: null, content: "เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง" });
+      setLoading(false);
+      return;
+    }
 
     if (!kratongData.status) {
-      const nameErrors: string[] = [];
-      const contentErrors: string[] = [];
+      const next: WishError = { name: null, content: null };
 
       if (kratongData.report === "cursed") {
-        if (kratongData.data.location === "name") {
-          nameErrors.push("ข้อมูลข้างต้นมีคำที่ไม่เหมาะสม");
-        }
-
-        if (kratongData.data.location === "content") {
-          contentErrors.push("ข้อมูลข้างต้นมีคำที่ไม่เหมาะสม");
-        }
+        if (kratongData.data.location === "name") next.name = "ข้อมูลข้างต้นมีคำที่ไม่เหมาะสม";
+        if (kratongData.data.location === "content") next.content = "ข้อมูลข้างต้นมีคำที่ไม่เหมาะสม";
       } else {
-        contentErrors.push("เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง");
+        next.content = "เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง";
       }
 
-      setError({
-        name: nameErrors.length === 0 ? null : nameErrors,
-        content: contentErrors.length === 0 ? null : contentErrors,
-      });
+      setError(next);
       setLoading(false);
       return;
     }
@@ -303,172 +166,45 @@ const CreateWish: FC<CreateWishProps> = ({ selected, wish, setWish, prevPage }) 
   };
 
   return (
-    <>
-      <div className="flex items-center fixed min-h-screen w-full top-0 z-20 px-10 font-ui">
-        {loading ? (
-          <span className="font-ui font-light mt-4 text-center text-white animate-pulse w-full">กำลังโหลด...</span>
-        ) : (
-          <div className="flex flex-col border border-white bg-white/20 backdrop-blur-lg max-w-[525px] w-full mx-auto rounded-[34px]">
-            <div className="h-full pt-8 pb-4 sm:pb-2 w-full">
-              <h1 className="text-white text-2xl text-center mb-0 sm:mb-1">ใส่คำอธิษฐาน</h1>
-              <div className="flex flex-col items-center">
-                <div className="relative h-[150px] mb-[10px]">
-                  <Kratong zIndex={7} height="150px" selected={selected} />
-                </div>
-                <svg className="w-[225px]" viewBox="0 0 370 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <ellipse
-                    cx="184.709"
-                    cy="20"
-                    rx="184.5"
-                    ry="20"
-                    fill="white"
-                    fillOpacity="0.3"
-                    style={{ mixBlendMode: "soft-light" }}
-                  />
-                </svg>
-              </div>
-            </div>
-            <div className="flex flex-col relative z-10 space-y-2 justify-between border border-white bg-white/40 h-full rounded-[34px] w-full pb-2">
-              <div>
-                <div className="flex flex-col space-y-2 justify-between w-full pt-6 px-4 sm:px-8 mt-3 overflow-y-auto">
-                  <div className="w-full">
-                    <fieldset>
-                      <label className="text-sm text-white" htmlFor="name">
-                        ชื่อ (ผู้อื่นสามารถเห็นได้)
-                      </label>
-                      <input
-                        name="name"
-                        type="text"
-                        onChange={(e) => {
-                          if (CharLimits.name - e.target.value.length < 0) return;
-
-                          setWish({
-                            name: e.target.value,
-                            content: wish.content,
-                          });
-                        }}
-                        value={wish.name ?? ""}
-                        className="block w-full mt-2 bg-transparent placeholder:text-[#eee]/70 text-[#fff] outline-hidden border-b-2 border-white px-2 pt-2 pb-1 mb-4"
-                        placeholder="นายเรียนเด่น เล่นดี"
-                      />
-                    </fieldset>
-                    <div className="block mt-2 w-full">
-                      <span className="text-sm text-red-600 float-left w-[200px]">
-                        {error.name && formatError(error.name)}
-                      </span>
-                      <span className="text-sm text-white float-right">{CharLimits.name - wish.name.length}</span>
-                    </div>
-                  </div>
-
-                  <div className="w-full">
-                    <fieldset>
-                      <label className="text-sm text-white" htmlFor="content">
-                        ใส่คำอธิษฐาน (ผู้อื่นสามารถเห็นได้)
-                      </label>
-                      <input
-                        name="content"
-                        type="text"
-                        onChange={(e) => {
-                          if (CharLimits.content - e.target.value.length < 0) return;
-
-                          setWish({
-                            name: wish.name,
-                            content: e.target.value,
-                          });
-                        }}
-                        value={wish.content ?? ""}
-                        className="block w-full mt-2 bg-transparent placeholder:text-[#eee]/70 text-[#fdfdfd] outline-hidden border-b-2 border-white px-2 pt-2 pb-1  mb-4"
-                        placeholder="กรอกคำอธิษฐาน"
-                      />
-                    </fieldset>
-
-                    <div className="block mt-2 w-full">
-                      <span className="text-sm text-red-600 float-left w-[200px]">
-                        {error.content && formatError(error.content)}
-                      </span>
-                      <span className="text-sm text-white float-right">{CharLimits.content - wish.content.length}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="flex justify-end space-x-2 px-4">
-                <button
-                  className="flex items-center text-[12px] bg-transparent text-white border border-white px-6 py-2 space-x-1 rounded-full font-light"
-                  onClick={() => prevPage()}
-                >
-                  <ChevronLeftIcon className="w-5 h-5" />
-                  <span>ย้อนกลับ</span>
-                </button>
-
-                <button
-                  className="flex items-center bg-[#2256A3] text-[12px] text-white px-6 py-2 rounded-full shadow-lg font-light"
-                  onClick={() => {
-                    if (!validateValues()) return;
-                    save();
-                    // nextPage();
-                  }}
-                >
-                  <span>ลอยกระทง !</span>
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-    </>
+    <BuilderStage title="ใส่คำอธิษฐาน" preview={<PreviewKratong selected={selected} />} previewKey={JSON.stringify(selected)}>
+      <BuilderSheet header={false} />
+      <WishField
+        label="ชื่อ"
+        top={321}
+        value={wish.name ?? ""}
+        placeholder="นายเรียนเด่น เล่นดี"
+        limit={CharLimits.name}
+        error={error.name}
+        errorTick={errorTick}
+        lineSrc={lineName}
+        onChange={(name) => setWish({ name, content: wish.content })}
+      />
+      <WishField
+        label="ใส่คำอธิษฐาน"
+        top={430}
+        value={wish.content ?? ""}
+        placeholder="ขอให้ได้คณะที่หวัง ขอให้มีหวานใจ สาธุ"
+        limit={CharLimits.content}
+        error={error.content}
+        errorTick={errorTick}
+        lineSrc={lineWish}
+        onChange={(content) => setWish({ name: wish.name, content })}
+      />
+      <ActionButtons
+        busy={loading}
+        onBack={prevPage}
+        submitLabel="ลอยกระทง !"
+        onSubmit={() => {
+          if (!validateValues()) return;
+          save();
+        }}
+      />
+    </BuilderStage>
   );
 };
 
 import type { ResultData as ResultData } from "@types-app/kratong";
 export type { ResultData };
-
-// interface ResultProps {
-//   data: ResultData;
-//   prevPage: () => void;
-// }
-
-// const Result: FC<ResultProps> = ({data, prevPage}) => {
-
-//   return (
-//     <>
-//       <div className="flex items-center fixed min-h-screen w-full top-0 z-20 px-10 font-ui">
-//         <div
-//           className="flex flex-col justify-center items-center space-y-6 border border-white bg-white/20 h-[80vh] max-h-[650px] max-w-[525px] w-full mx-auto rounded-[34px]">
-//           <div className="pt-8 pb-4 sm:pb-2 w-full">
-//             <h1 className="text-white text-2xl text-center mb-8">สำเร็จ</h1>
-//             <p className="text-white font-light text-lg text-center mb-2">{data.wish.name}:</p>
-//             <p className="text-white font-light text-sm text-center mb-2">{data.wish.content}</p>
-//           </div>
-//           <div className="flex flex-col items-center">
-//             <div className="relative h-[150px] mb-[15px]">
-//               <Kratong zIndex={7} height="150px" selected={data.kratong}/>
-//             </div>
-//             <svg className="w-[225px]" viewBox="0 0 370 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-//               <ellipse
-//                 cx="184.709"
-//                 cy="20"
-//                 rx="184.5"
-//                 ry="20"
-//                 fill="white"
-//                 fillOpacity="0.3"
-//                 style={{mixBlendMode: "soft-light"}}
-//               />
-//             </svg>
-//           </div>
-//           <div className="justify-self-end flex justify-end space-x-2 px-4">
-//             <button
-//               className="relative z-40 flex items-center text-md bg-white text-[#2256A3] border border-white px-6 py-2 space-x-1 rounded-full font-light"
-//               onClick={() => prevPage()}
-//             >
-//               <ChevronLeftIcon className="w-5 h-5"/>
-//               <span>กลับไปแก้ไขกระทง</span>
-//             </button>
-//           </div>
-//         </div>
-//       </div>
-//     </>
-//   );
-// };
 
 import type { ResultData as KratongData } from "@types-app/kratong";
 export type { KratongData };
@@ -521,10 +257,11 @@ export const Create: FC<{ idata?: KratongData | null }> = ({ idata }) => {
   };
 
   return (
-    <>
-      {page === 1 && <CreateKratong selected={data.kratong} setSelected={setKratong} nextPage={goNext} />}
+    <BuilderShell>
+      {page === 1 && <CreateKratong key="build" selected={data.kratong} setSelected={setKratong} nextPage={goNext} />}
       {page === 2 && (
         <CreateWish
+          key="wish"
           wish={data.wish}
           setWish={setWish}
           selected={data.kratong}
@@ -532,6 +269,6 @@ export const Create: FC<{ idata?: KratongData | null }> = ({ idata }) => {
           prevPage={goPrev}
         />
       )}
-    </>
+    </BuilderShell>
   );
 };
