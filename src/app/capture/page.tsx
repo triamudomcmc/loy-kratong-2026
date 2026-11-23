@@ -1,5 +1,5 @@
 import { CaptureKratong } from "@components/Capture";
-import type { KratongData } from "@types-app/kratong";
+import type { AnyResultData, KratongData } from "@types-app/kratong";
 
 const sample: KratongData = {
   kratong: {
@@ -15,11 +15,11 @@ const sample: KratongData = {
   },
 };
 
-function parseData(raw: string | string[] | undefined): KratongData {
+function parseData(raw: string | string[] | undefined): AnyResultData {
   if (typeof raw !== "string" || !raw) return sample;
   try {
     const parsed = JSON.parse(raw);
-    if (parsed && typeof parsed === "object" && parsed.kratong && parsed.wish) return parsed as KratongData;
+    if (parsed && typeof parsed === "object" && parsed.kratong && parsed.wish) return parsed as AnyResultData;
   } catch {
     // fall through to sample
   }

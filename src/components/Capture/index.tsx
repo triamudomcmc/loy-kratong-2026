@@ -1,166 +1,146 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
-import type { FC } from "react";
-import Image from "next/image";
-import { Cloud } from "@components/Vector/cloud";
-import { WaterFour, WaterOne, WaterThree, WaterTwo } from "@components/Water";
-import clsx from "clsx";
-import type { KratongData } from "@types-app/kratong";
-import { IdleCaptureKratong } from "./capturekratong";
+import type { CSSProperties, FC, ReactNode } from "react";
+import { Layer, Moon, NavHeader, TealSky, u } from "@components/ui";
+import type { AnyResultData, CupsaaKratongData, KratongData, PrincipalKratongData } from "@types-app/kratong";
+import { StandardKratong as Kratong } from "./capturekratong";
+import { PrincipalKratong } from "@components/Principal/kratong";
+import { CUPSAAKratong } from "@components/CUPSAA/kratong";
 
-const layer = "absolute left-[calc(-2vw_-_350px)]";
+const A = "/assets/figma/capture";
 
-export const CaptureKratong: FC<{ data: KratongData }> = ({ data }) => {
+/** Figma-layer box with percent insets (negative insets bleed past the box). */
+const Bleed = ({ inset, src }: { inset: string; src: string }) => (
+  <div className="absolute" style={{ inset }}>
+    <img alt="" className="block size-full max-w-none" src={src} />
+  </div>
+);
+
+interface Place {
+  x: number;
+  y: number;
+  size: number;
+  z: number;
+  filter?: string;
+}
+
+/** The user's kratong: picks the renderer from the shape of the saved data. */
+const UserKratong: FC<{ data: AnyResultData; place: Place }> = ({ data, place }) => {
+  const k = data.kratong as unknown as Record<string, string | number>;
+  const size = u(place.size);
+  let node: ReactNode;
+  if ("swan" in k) node = <PrincipalKratong selected={data.kratong as PrincipalKratongData["kratong"]} height={size} zIndex={place.z} />;
+  else if (!("decorations" in k)) node = <CUPSAAKratong selected={data.kratong as CupsaaKratongData["kratong"]} height={size} zIndex={place.z} />;
+  else node = <Kratong data={data as KratongData} size={size} />;
   return (
-    <div className="relative h-[1920px] w-[1080px] bg-[#eee]">
-      <nav className="absolute top-[46px] left-[48px]  w-full z-[99]">
-        <div className="max-w-[306px]">
-          <Image src="/assets/images/logo.png" width={1024} height={169} alt="โลโก้ กช." />
-        </div>
-      </nav>
-      <div className="absolute top-[5px] z-[9] w-full">
-        <div className="w-[490px] absolute z-[3] left-[-96px] top-[201px] opacity-[15%] ">
-          <Cloud />
-        </div>
-        <div className="w-[448px] absolute z-[3] left-[296px] top-[303px] opacity-[15%] ">
-          <Cloud />
-        </div>
-        <div className="w-[465px] absolute z-[3] right-[-96px] top-[231px] opacity-[15%] ">
-          <Cloud />
-        </div>
-        <div className="absolute right-[46px] top-[35px] z-[8] h-[375px] w-[375px]">
-          <div className="absolute left-1/2 top-1/2 z-[7] w-[65%] -translate-x-1/2 -translate-y-1/2">
-            <img src="/assets/images/scene/moon.gif" width={2048} height={2048} alt="ดวงจันทร์" />
-          </div>
-          <div className="absolute top-0 z-[6]">
-            <img src="/assets/images/scene/blur.png" width={3414} height={3414} alt="ดวงจันทร์" />
-          </div>
-        </div>
-        {/* <div className={styles["fireworks-1"]}>
-          <Image src="/assets/images/scene/fireworks-red.png" width={692} height={754} />
-        </div>
-        <div className={styles["fireworks-2"]}>
-          <Image src="/assets/images/scene/fireworks-purple.png" width={692} height={754} />
-        </div> */}
-        <div className="absolute left-[200px] top-[65px] z-[7] h-[494px] w-[640px]">
-          <img src="/assets/images/scene/capture-fireworks-flipped.png" width={2048} height={2048} alt="" />
-        </div>
-      </div>
-      <div className="relative h-full w-full overflow-hidden bg-[linear-gradient(180deg,#000000_0%,#236bad_70.87%)]">
-        <div className={clsx(layer, "z-10 bottom-[30px]")}>
-          <div className="relative w-[554vw] bottom-[-193px]">
-            <div className="absolute top-[-166px] z-[5] flex w-[300vw]">
-              <div className="w-[275%]">
-                <img src="/assets/images/scene/buildings.png" width={2328} height={318} alt="ตึก" />
-              </div>
-            </div>
-            <WaterFour />
-          </div>
-        </div>
+    <div className="absolute" style={{ left: u(place.x), top: u(place.y), zIndex: place.z, filter: place.filter }}>
+      {node}
+    </div>
+  );
+};
 
-        <div className={clsx(layer, "z-20 bottom-[110px]")}>
-          <div className="relative w-[554vw] bottom-[-526px]">
-            <WaterThree />
-            <IdleCaptureKratong
-              lane="t"
-              className="absolute z-[29] brightness-[40%]"
-              data={{
-                kratong: {
-                  base: "banana-leaf",
-                  candles: "candle-yellow",
-                  decorations: "sign-want-love",
-                  flowers: "love",
-                  signVariant: 0,
-                },
-                wish: { content: "", name: "" },
-              }}
-              size={"280px"}
-              initialX={332}
-              initialY={-151}
-              highlighted={false}
-            />
+const mk = (
+  base: string,
+  candles: string,
+  decorations: string,
+  flowers: string,
+  signVariant: number,
+): KratongData => ({ kratong: { base, candles, decorations, flowers, signVariant }, wish: { name: "", content: "" } });
 
-            <IdleCaptureKratong
-              lane="t"
-              className="absolute z-[29] brightness-[40%]"
-              data={{
-                kratong: {
-                  base: "ice",
-                  candles: "candle-yellow",
-                  decorations: "sign-quote",
-                  flowers: "luck",
-                  signVariant: 1,
-                },
-                wish: { content: "", name: "" },
-              }}
-              size={"280px"}
-              initialX={1222}
-              initialY={-181}
-              highlighted={false}
+/** Surrounding kratongs (Figma 91:1029, 91:1030, 91:1044, 91:1045). */
+const OTHERS: { data: KratongData; place: Place }[] = [
+  { data: mk("banana-leaf", "candle-yellow", "sign-want-love", "love", 0), place: { x: -15, y: 340, size: 100, z: 2, filter: "brightness(.45)" } },
+  { data: mk("ice", "candle-yellow", "sign-quote", "luck", 1), place: { x: 367, y: 349, size: 90.653, z: 3 } },
+  { data: mk("coconut-shell", "candle-yellow", "sign-enttid", "summer-fruits", 0), place: { x: 315, y: 516, size: 160, z: 6 } },
+  { data: mk("ice", "candle-blue", "sign-want-money", "study", 1), place: { x: -38, y: 520, size: 155, z: 7, filter: "brightness(.8)" } },
+];
+
+const CENTER: Place = { x: 90, y: 283, size: 250, z: 5 };
+
+/**
+ * Share image (Figma หน้าบันทึกหน้าจอ 91:1023, 431x812) screenshotted by /api/capture at 1080x1920.
+ * `--u` = 100vh / 812, so the design fills the viewport height; the design box is centred and the sky,
+ * water and skyline bleed sideways to fill the (slightly wider) viewport.
+ */
+export const CaptureKratong: FC<{ data: AnyResultData }> = ({ data }) => {
+  return (
+    <div
+      className="relative h-screen w-screen overflow-hidden"
+      style={{ ["--u" as string]: "calc(100vh / 812)" } as CSSProperties}
+    >
+      <TealSky />
+      <div className="absolute top-0 h-full" style={{ left: `calc(50% - ${u(215.5)})`, width: u(431) }}>
+        {/* water (back to front: น้ำ 3, น้ำ 2, น้ำ 1 ล่างสุด) */}
+        <Layer x={-1473} y={406} w={2934} h={512}>
+          <Bleed inset="-6.84% -1.02% -4.88% -1.02%" src={`${A}/water-3.svg`} />
+        </Layer>
+        <div className="absolute" style={{ inset: "64.66% -227.38% -31.29% -359.86%" }}>
+          <Bleed inset="-6.47% -1.01% -4.62% -1.01%" src={`${A}/water-2.svg`} />
+        </div>
+        <div className="absolute" style={{ inset: "82.27% -293.04% -48.9% -361.72%" }}>
+          <Bleed inset="-6.47% -0.92% -4.62% -0.92%" src={`${A}/water-1.svg`} />
+        </div>
+        <Layer
+          x={299}
+          y={540}
+          w={70}
+          h={55}
+          style={{ backgroundImage: "linear-gradient(to bottom, rgba(52,143,197,0) 0%, #348fc5 32.575%)" }}
+        />
+        {/* skyline */}
+        <Layer x={-1871} y={112.61} w={2370} h={299.722}>
+          <div className="absolute inset-0 overflow-hidden pointer-events-none" style={{ opacity: 0.44 }}>
+            <img
+              alt=""
+              className="absolute left-0 w-full max-w-none"
+              style={{ height: "330.89%", top: "-168.53%" }}
+              src={`${A}/buildings.png`}
             />
           </div>
-        </div>
+        </Layer>
 
-        <div className={clsx(layer, "z-30 bottom-[-474px]")}>
-          <div className="relative w-[554vw] bottom-[-344px]">
-            <IdleCaptureKratong
-              lane="m"
-              className="absolute z-[29]"
-              data={{ kratong: data.kratong, wish: { content: "", name: "" } }}
-              size={"550px"}
-              initialX={662}
-              initialY={-451}
-              highlighted={true}
-            />
-            <WaterTwo />
-          </div>
-        </div>
+        {OTHERS.slice(0, 2).map((o, i) => (
+          <UserKratong key={i} data={o.data} place={o.place} />
+        ))}
+        <Layer x={45} y={294} w={335} h={335}>
+          <img alt="" className="absolute block inset-0 size-full max-w-none" src={`${A}/glow-center.svg`} />
+        </Layer>
+        <UserKratong data={data} place={CENTER} />
+        {OTHERS.slice(2).map((o, i) => (
+          <UserKratong key={i} data={o.data} place={o.place} />
+        ))}
 
-        <div className={clsx(layer, "z-40 bottom-[-17px]")}>
-          <div className="relative w-[554vw] bottom-[-1049px]">
-            <IdleCaptureKratong
-              lane="b"
-              className="absolute z-[29] brightness-[65%]"
-              data={{
-                kratong: {
-                  base: "ice",
-                  candles: "candle-blue",
-                  decorations: "sign-want-money",
-                  flowers: "study",
-                  signVariant: 1,
-                },
-                wish: { content: "", name: "" },
-              }}
-              size={"380px"}
-              initialX={332}
-              initialY={-281}
-              highlighted={false}
-            />
-            <WaterOne />
+        {/* clouds, opacity 13% */}
+        <Layer x={260} y={113} w={146.807} h={99.006} style={{ opacity: 0.13 }}>
+          <img alt="" className="absolute block inset-0 size-full max-w-none" src={`${A}/cloud-3.svg`} />
+        </Layer>
+        <Layer x={154} y={188} w={113} h={78} style={{ opacity: 0.13 }}>
+          <img alt="" className="absolute block inset-0 size-full max-w-none" src={`${A}/cloud-4.svg`} />
+        </Layer>
+        <Layer x={-31} y={99} w={185} h={113} style={{ opacity: 0.13, transform: "scaleX(-1)" }}>
+          <img alt="" className="absolute block inset-0 size-full max-w-none" src={`${A}/cloud-6.svg`} />
+        </Layer>
 
-            <IdleCaptureKratong
-              lane="b"
-              className="absolute z-[29] brightness-[65%]"
-              data={{
-                kratong: {
-                  base: "coconut-shell",
-                  candles: "candle-yellow",
-                  decorations: "sign-enttid",
-                  flowers: "summer-fruits",
-                  signVariant: 0,
-                },
-                wish: { content: "", name: "" },
-              }}
-              size={"380px"}
-              initialX={1112}
-              initialY={-251}
-              highlighted={false}
+        {/* fireworks (GIFs) */}
+        <Layer x={79} y={50} w={266} h={266} style={{ transform: "scaleX(-1)" }}>
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            <img
+              alt=""
+              className="absolute max-w-none size-full"
+              style={{ left: "14.16%", top: "-7.79%" }}
+              src={`${A}/fireworks-5.png`}
             />
           </div>
-        </div>
-      </div>
-      <div className="w-full absolute bottom-[90px] z-[99] px-[75px]">
-        <p className="font-display font-light text-7xl text-white w-full text-center">{data.wish.name}</p>
+        </Layer>
+
+        <NavHeader />
+        <Layer x={85} y={718} w={272} h={32} className="text-center text-white">
+          <p className="font-display" style={{ fontSize: u(36), lineHeight: "normal", whiteSpace: "nowrap" }}>
+            ว้าว กระทงของคุณเท่จัง !
+          </p>
+        </Layer>
+        <Moon glow={{ x: 269, y: 50, size: 99 }} body={{ x: 269, y: 49, size: 101 }} />
       </div>
     </div>
   );
