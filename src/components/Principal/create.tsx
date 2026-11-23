@@ -55,7 +55,7 @@ const CreateKratong = ({ selected, setSelected, nextPage }: CreateKratongProps) 
 
   return (
     <div className="flex items-center fixed min-h-screen w-full top-0 z-20 px-10 font-ui">
-      <div className="flex flex-col border border-white bg-white/20 max-w-[525px] w-full mx-auto rounded-[34px]">
+      <div className="flex flex-col border border-white bg-white/20 backdrop-blur-lg max-w-[525px] w-full mx-auto rounded-[34px]">
         <div className="h-full pt-8 pb-4 sm:pb-2 w-full">
           <h1 className="text-white text-2xl text-center mb-0 sm:mb-1">สร้างกระทง</h1>
           <div className="flex flex-col items-center">
@@ -194,7 +194,7 @@ const CreateWish = ({ selected, wish, setWish, nextPage, prevPage }: CreateWishP
   return (
     <>
       <div className="flex items-center fixed min-h-screen w-full top-0 z-20 px-10 font-ui">
-        <div className="flex flex-col border border-white bg-white/20 max-w-[525px] w-full mx-auto rounded-[34px]">
+        <div className="flex flex-col border border-white bg-white/20 backdrop-blur-lg max-w-[525px] w-full mx-auto rounded-[34px]">
           <div className="h-full pt-8 pb-4 sm:pb-2 w-full">
             <h1 className="text-white text-2xl text-center mb-0 sm:mb-1">ใส่คำอธิษฐาน</h1>
             <div className="flex flex-col items-center">
@@ -338,7 +338,7 @@ const Result = ({ id, data, prevPage }: ResultProps) => {
   return (
     <>
       <div className="flex items-center fixed min-h-screen w-full top-0 z-20 px-10 font-ui">
-        <div className="flex flex-col justify-center items-center space-y-6 border border-white bg-white/20 h-[80vh] max-h-[650px] max-w-[525px] w-full mx-auto rounded-[34px]">
+        <div className="flex flex-col justify-center items-center space-y-6 border border-white bg-white/20 backdrop-blur-lg h-[80vh] max-h-[650px] max-w-[525px] w-full mx-auto rounded-[34px]">
           <div className="pt-8 pb-4 sm:pb-2 w-full">
             <h1 className="text-white text-2xl text-center mb-8">สำเร็จ</h1>
             <p className="text-white font-light text-lg text-center mb-2">{data.wish.name}:</p>

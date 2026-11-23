@@ -177,7 +177,7 @@ export function PageFive() {
           </a>
         </div>
 
-        <div className="absolute w-[550px] sm:w-[650px] lg:w-[700px] bottom-[-30px] z-[-1] left-[50%]">
+        <div className="absolute w-[550px] sm:w-[650px] lg:w-[700px] bottom-[-30px] z-[-1] left-[50%] -translate-x-1/2">
           <Image
             width={1350}
             height={753}
@@ -199,7 +199,7 @@ export function PageFive() {
           />
         </div> */}
 
-        <div className="absolute w-full bottom-[-77px] sm:bottom-[-160px] lg:bottom-[-40%] z-[-2] left-[50%]">
+        <div className="absolute w-full bottom-[-77px] sm:bottom-[-160px] lg:bottom-[-40%] z-[-2] left-[50%] -translate-x-1/2">
           <Image
             width={2000}
             height={1350}

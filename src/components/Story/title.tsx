@@ -172,7 +172,7 @@ export default function TitleScreen() {
               duration: DURATION / 1000,
             }}
           >
-            <div className="absolute w-[65%] left-[50%] z-[-1] top-[50%]">
+            <div className="absolute w-[65%] left-[50%] z-[-1] top-[50%] -translate-x-1/2 -translate-y-1/2">
               <Image src="/assets/images/scene/moon.gif" width={2048} height={2048} className="object-cover" alt="ดวงจันทร์" />
             </div>
             <div className="absolute top-0 z-[-2]">

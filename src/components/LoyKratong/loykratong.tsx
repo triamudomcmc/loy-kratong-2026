@@ -139,7 +139,7 @@ const LoyKratongScene: FC<{ entities: ResultData[] }> = ({ entities }) => {
           </div>
         </div>
         <div className="absolute w-[150px] h-[150px] right-[10vw] top-[35px] z-[8]">
-          <div className="absolute w-[65%] left-[50%] top-[50%] z-[7]">
+          <div className="absolute w-[65%] left-[50%] top-[50%] -translate-x-1/2 -translate-y-1/2 z-[7]">
             <Image src="/assets/images/scene/moon.gif" width={2048} height={2048} className="object-cover" alt="ดวงจันทร์" />
           </div>
           <div className="absolute top-0 z-[6]">
@@ -209,7 +209,7 @@ const LoyKratongScene: FC<{ entities: ResultData[] }> = ({ entities }) => {
             {idle && (
               <IdleKratong
                 highlighted
-                className="transition-opacity absolute top-[-50px] nak:top-[-60px] lg:top-[-46px]"
+                className="transition-opacity absolute top-[-50px] nak:top-[-60px] lg:top-[-46px] hover:brightness-100 active:brightness-110"
                 lane="m"
                 size={["155px", "115px"]}
                 initialX={idle.initialX}
@@ -223,7 +223,7 @@ const LoyKratongScene: FC<{ entities: ResultData[] }> = ({ entities }) => {
               lane="m"
               size={["185px", "135px"]}
               className={
-                "transition-opacity absolute top-[-48px] nak:top-[-60px] lg:top-[-44px]"
+                "transition-opacity absolute top-[-48px] nak:top-[-60px] lg:top-[-44px] hover:brightness-100 active:brightness-110"
               }
             />
             <MidLane entities={lanes[1]} />
@@ -262,7 +262,7 @@ const LoyKratongScene: FC<{ entities: ResultData[] }> = ({ entities }) => {
               )}
             </div>
             <PrincipalIdleKratong
-              className="transition-opacity absolute top-[-74px] nak:top-[-72px] lg:top-[-68px]"
+              className="transition-opacity absolute top-[-74px] nak:top-[-72px] lg:top-[-68px] brightness-[99%] hover:brightness-100 active:brightness-110"
               lane="b"
               size={["200px", "170px"]}
               initialX={width > 640 ? 750 : 490}
@@ -271,7 +271,7 @@ const LoyKratongScene: FC<{ entities: ResultData[] }> = ({ entities }) => {
             {localLoy && prevEntity && (
               <MovingKratong
                 className={
-                  "transition-opacity absolute left-[350px] top-[-54px] nak:top-[-58px] lg:top-[-40px]"
+                  "transition-opacity absolute left-[350px] top-[-54px] nak:top-[-58px] lg:top-[-40px] brightness-[90%] hover:brightness-100 active:brightness-110"
                 }
                 initialX={width > 640 ? 62 : -25}
                 data={prevEntity}

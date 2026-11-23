@@ -25,7 +25,7 @@ const waterTransition = WaterFourData.transition as Transition;
 
 const DisplayName: FC<{ name: string }> = ({ name }) => {
   return (
-    <span className="absolute w-[150%] left-1/2 text-white z-[99] text-xs sm:text-sm top-[-29px] text-center font-light font-ui">
+    <span className="absolute w-[150%] left-1/2 -translate-x-1/2 text-white z-[99] text-xs sm:text-sm top-[-29px] text-center font-light font-ui">
       {name}
     </span>
   );

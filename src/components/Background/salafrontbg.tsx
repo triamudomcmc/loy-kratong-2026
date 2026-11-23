@@ -10,7 +10,7 @@ export default function SalaFrontBG() {
   return (
     <>
       <div className="h-screen relative bg-[linear-gradient(182.71deg,#281981_-2.41%,#3a71b3_47.53%,#1a3270_100.68%)]">
-        <div className="relative h-screen overflow-hidden select-none pointer-events-none">
+        <div className="relative h-screen overflow-hidden select-none pointer-events-none blur-xs">
           <div className="w-full h-full absolute z-[3] backdrop-blur-[4px] bg-[linear-gradient(260.4deg,rgba(255,149,149,0.78)_5.94%,rgba(58,137,255,0.713602)_58.41%,rgba(144,92,255,0.63)_114.03%)]" />
           <div className="fixed w-[140px] h-[140px] right-[45px] top-[55px] sm:w-[200px] sm:h-[200px] sm:right-[50px] sm:top-[25px]">
             <div className="absolute w-[65%] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-[2]">

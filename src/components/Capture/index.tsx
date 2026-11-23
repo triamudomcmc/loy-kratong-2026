@@ -63,7 +63,7 @@ export const CaptureKratong: FC<{ data: KratongData }> = ({ data }) => {
             <WaterThree />
             <IdleCaptureKratong
               lane="t"
-              className="absolute z-[29]"
+              className="absolute z-[29] brightness-[40%]"
               data={{
                 kratong: {
                   base: "banana-leaf",
@@ -82,7 +82,7 @@ export const CaptureKratong: FC<{ data: KratongData }> = ({ data }) => {
 
             <IdleCaptureKratong
               lane="t"
-              className="absolute z-[29]"
+              className="absolute z-[29] brightness-[40%]"
               data={{
                 kratong: {
                   base: "ice",
@@ -120,7 +120,7 @@ export const CaptureKratong: FC<{ data: KratongData }> = ({ data }) => {
           <div className="relative w-[554vw] bottom-[-1049px]">
             <IdleCaptureKratong
               lane="b"
-              className="absolute z-[29]"
+              className="absolute z-[29] brightness-[65%]"
               data={{
                 kratong: {
                   base: "ice",
@@ -140,7 +140,7 @@ export const CaptureKratong: FC<{ data: KratongData }> = ({ data }) => {
 
             <IdleCaptureKratong
               lane="b"
-              className="absolute z-[29]"
+              className="absolute z-[29] brightness-[65%]"
               data={{
                 kratong: {
                   base: "coconut-shell",

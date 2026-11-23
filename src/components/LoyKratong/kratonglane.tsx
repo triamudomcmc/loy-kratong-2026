@@ -98,7 +98,7 @@ export const TopLane: FC<{ entities: ResultData[] }> = ({ entities }) => {
             <MovingKratong
               key={`lane-t-${i}`}
               className={
-                "transition-opacity absolute left-[550px] top-[6px] nak:top-[-12px] lg:top-[-4px]"
+                "transition-opacity absolute left-[550px] top-[6px] nak:top-[-12px] lg:top-[-4px] brightness-50 hover:brightness-100 active:brightness-110"
               }
               initialX={i * 600}
               data={e}
@@ -120,7 +120,7 @@ export const MidLane: FC<{ entities: ResultData[] }> = ({ entities }) => {
             <MovingKratong
               key={`lane-m-${i}`}
               className={
-                "transition-opacity absolute left-[250px] top-[-42px] nak:top-[-60px] lg:top-[-46px]"
+                "transition-opacity absolute left-[250px] top-[-42px] nak:top-[-60px] lg:top-[-46px] brightness-[60%] hover:brightness-100 active:brightness-110"
               }
               initialX={i * 670}
               data={e}
@@ -142,7 +142,7 @@ export const BotLane: FC<{ entities: ResultData[] }> = ({ entities }) => {
             <MovingKratong
               key={`lane-b-${i}`}
               className={
-                "transition-opacity absolute left-[350px] top-[-54px] nak:top-[-58px] lg:top-[-62px]"
+                "transition-opacity absolute left-[350px] top-[-54px] nak:top-[-58px] lg:top-[-62px] brightness-[90%] hover:brightness-100 active:brightness-110"
               }
               initialX={i * 660 + 300}
               data={e}

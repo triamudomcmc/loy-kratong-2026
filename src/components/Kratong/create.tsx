@@ -86,7 +86,7 @@ const CreateKratong: FC<CreateKratongProps> = ({ selected, setSelected, nextPage
 
   return (
     <div className="flex items-center fixed min-h-screen w-full top-0 z-20 px-10 font-ui">
-      <div className="flex flex-col border border-white bg-white/20 max-w-[525px] w-full mx-auto rounded-[34px]">
+      <div className="flex flex-col border border-white bg-white/20 backdrop-blur-lg max-w-[525px] w-full mx-auto rounded-[34px]">
         <div className="h-full pt-8 pb-4 sm:pb-2 w-full">
           <h1 className="text-white text-2xl text-center mb-0 sm:mb-1">สร้างกระทง</h1>
           <div className="flex flex-col items-center">
@@ -308,7 +308,7 @@ const CreateWish: FC<CreateWishProps> = ({ selected, wish, setWish, prevPage }) 
         {loading ? (
           <span className="font-ui font-light mt-4 text-center text-white animate-pulse w-full">กำลังโหลด...</span>
         ) : (
-          <div className="flex flex-col border border-white bg-white/20 max-w-[525px] w-full mx-auto rounded-[34px]">
+          <div className="flex flex-col border border-white bg-white/20 backdrop-blur-lg max-w-[525px] w-full mx-auto rounded-[34px]">
             <div className="h-full pt-8 pb-4 sm:pb-2 w-full">
               <h1 className="text-white text-2xl text-center mb-0 sm:mb-1">ใส่คำอธิษฐาน</h1>
               <div className="flex flex-col items-center">
