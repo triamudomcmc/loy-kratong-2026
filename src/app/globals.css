@@ -10,6 +10,15 @@
   --font-display: var(--font-chula-narak), "ChulaNarak", serif;
   --font-ui: var(--font-plex-sans-thai), "IBM Plex Sans Thai", sans-serif;
   --font-title: var(--font-maitree), "Maitree", serif;
+  --font-noto: var(--font-noto-sans-thai), "Noto Sans Thai", sans-serif;
+
+  /* teal sky palette (Figma ปก / Scene 1-4 / Scene 17) */
+  --color-sky-top: #4dafa9;
+  --color-sky-mid: #7cbfab;
+  --color-sky-bottom: #1d9fa6;
+  --color-pill: #f6f6f6;
+  --color-ink: #4a4a4a;
+  --color-primary: #2256a3;
 
   --breakpoint-*: initial;
   --breakpoint-custom: 460px;
@@ -19,6 +28,67 @@
   --breakpoint-lg: 1024px;
   --breakpoint-xl: 1280px;
   --breakpoint-2xl: 1536px;
+}
+
+/*
+ * Figma frame scaling. `--u` = container width / frame width, so `calc(var(--u) * N)` is N design px.
+ * Mobile frames (375 wide) fill min(100vw, 430px); desktop frames (1440 wide) fill 100vw.
+ */
+.frame-mobile {
+  --u: calc(min(100vw, 430px) / 375);
+  width: min(100vw, 430px);
+  height: calc(var(--u) * 812);
+  margin-inline: auto;
+}
+.frame-desktop {
+  --u: calc(100vw / 1440);
+  width: 100vw;
+  height: calc(var(--u) * 1024);
+}
+.frame-fit {
+  --u: min(calc(100vw / 375), calc(100dvh / 812));
+  width: calc(var(--u) * 375);
+  height: calc(var(--u) * 812);
+  margin-inline: auto;
+}
+/* Stage: viewport-filling layer (scenery bleeds to every edge) holding a centred 375x812 box
+   scaled to fit the viewport. Children use `u(n)` at their Figma coordinates. */
+.stage-box {
+  --u: min(calc(100vw / 375), calc(100dvh / 812));
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: calc(var(--u) * 375);
+  height: calc(var(--u) * 812);
+  transform: translate(-50%, -50%);
+}
+.stage-box-bottom {
+  top: auto;
+  bottom: 0;
+  transform: translateX(-50%);
+}
+.stage-box-desktop {
+  --u: min(calc(100vw / 1440), calc(100dvh / 1024));
+  width: calc(var(--u) * 1440);
+  height: calc(var(--u) * 1024);
+}
+.nav-fixed {
+  --u: calc(min(100vw, 430px) / 375);
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(100vw, 430px);
+  height: calc(var(--u) * 52);
+  z-index: 99;
+  pointer-events: none;
+}
+@media (min-width: 1024px) {
+  .nav-fixed {
+    --u: calc(100vw / 1440);
+    width: 100vw;
+    height: calc(var(--u) * 100);
+  }
 }
 
 @utility blinking-text {
@@ -34,6 +104,25 @@
   button:not(:disabled),
   [role="button"]:not(:disabled) {
     cursor: pointer;
+  }
+
+  /*
+   * Canvas under every scene. With no background the browser canvas is white, which shows as a hairline at the
+   * screen edges wherever a scaled layer ends a sub-pixel short (DevTools "fit to window", odd DPRs) and as white
+   * bands when the page is rubber-band overscrolled on phones. Match the scenes instead and turn off the bounce.
+   */
+  html,
+  body {
+    background-color: #1d9fa6; /* teal sky bottom: story, river, capture, loading */
+    overscroll-behavior: none;
+  }
+  html:has([data-scene="builder"]),
+  html:has([data-scene="builder"]) body {
+    background-color: #7b5fb0; /* the builder's pink/blue glass backdrop */
+  }
+  html:has([data-scene="plain"]),
+  html:has([data-scene="plain"]) body {
+    background-color: #fff; /* plain pages: /error, /filter */
   }
 
   body {

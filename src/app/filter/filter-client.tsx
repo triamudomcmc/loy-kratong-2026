@@ -56,7 +56,7 @@ export function FilterClient() {
   }, [password]);
 
   return (
-    <div className="font-ui px-6 py-6">
+    <div data-scene="plain" className="font-ui px-6 py-6">
       <h1 className="text-xl font-medium">ตรวจสอบระบบ</h1>
       <input
         className="border border-black"

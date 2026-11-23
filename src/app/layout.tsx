@@ -1,12 +1,12 @@
 import type { Metadata, Viewport } from "next";
-import { IBM_Plex_Sans_Thai, Maitree } from "next/font/google";
+import { IBM_Plex_Sans_Thai, Maitree, Noto_Sans_Thai } from "next/font/google";
 import localFont from "next/font/local";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { ClientShell } from "@components/ClientShell";
 import "./globals.css";
 
 const plexSansThai = IBM_Plex_Sans_Thai({
-  weight: ["300", "400", "500"],
+  weight: ["300", "400", "500", "700"],
   subsets: ["thai", "latin"],
   display: "swap",
   variable: "--font-plex-sans-thai",
@@ -19,6 +19,13 @@ const maitree = Maitree({
   variable: "--font-maitree",
 });
 
+const notoSansThai = Noto_Sans_Thai({
+  weight: ["400", "700"],
+  subsets: ["thai", "latin"],
+  display: "swap",
+  variable: "--font-noto-sans-thai",
+});
+
 const chulaNarak = localFont({
   src: "../../public/assets/fonts/ChulaNarak Regular.woff2",
   weight: "400",
@@ -27,7 +34,7 @@ const chulaNarak = localFont({
   variable: "--font-chula-narak",
 });
 
-const title = "ลอยกระทงออนไลน์ 2564";
+const title = "ลอยกระทงออนไลน์ 2569";
 const description = "ร่วมลอยกระทงออนไลน์ โดยคณะกรรมการงานกิจกรรมพัฒนาผู้เรียน (กช.) โรงเรียนเตรียมอุดมศึกษา";
 const url = "https://loykratong.triamudom.club/";
 
@@ -36,7 +43,7 @@ export const metadata: Metadata = {
   title,
   description,
   keywords:
-    "เตรียมอุดมศึกษา, กช., ลอยกระทง, สร้างกระทง, ลอยกระทงกับเพื่อน, Loy Kratong, Loy Krathong, ลอยกระทงอยู่บ้าน, ลอยกระทงออนไลน์, 2564, ลอยกระทงออนไลน์ 2564, ลอยกระทงเตรียม, ลอยกระทงเตรียมอุดม, กช. เตรียมอุดม, กช เตรียมอุดม, เตรียม, คณะกรรมการงานกิจกรรมพัฒนาผู้เรียน",
+    "เตรียมอุดมศึกษา, กช., ลอยกระทง, สร้างกระทง, ลอยกระทงกับเพื่อน, Loy Kratong, Loy Krathong, ลอยกระทงอยู่บ้าน, ลอยกระทงออนไลน์, 2569, ลอยกระทงออนไลน์ 2569, ลอยกระทงเตรียม, ลอยกระทงเตรียมอุดม, กช. เตรียมอุดม, กช เตรียมอุดม, เตรียม, คณะกรรมการงานกิจกรรมพัฒนาผู้เรียน",
   authors: [{ name: "คณะกรรมการงานกิจกรรมพัฒนาผู้เรียน โรงเรียนเตรียมอุดมศึกษา" }],
   manifest: "/manifest.webmanifest",
   icons: {
@@ -68,7 +75,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="th" className={`${plexSansThai.variable} ${maitree.variable} ${chulaNarak.variable}`}>
+    <html lang="th" className={`${plexSansThai.variable} ${maitree.variable} ${chulaNarak.variable} ${notoSansThai.variable}`}>
       <body>
         <ClientShell>{children}</ClientShell>
       </body>
