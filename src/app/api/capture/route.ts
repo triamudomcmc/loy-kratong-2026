@@ -9,7 +9,12 @@ export async function GET(req: NextRequest) {
   if (!data) return new Response("Missing data", { status: 400 });
 
   try {
-    const file = await screenshot(`${req.nextUrl.origin}/capture?data=${encodeURIComponent(data)}`, 1080, 1920);
+    // In production render the capture page through the server itself (behind a proxy the public origin may not be
+    // reachable from inside the container); CAPTURE_ORIGIN overrides it.
+    const origin =
+      process.env.CAPTURE_ORIGIN ||
+      (process.env.NODE_ENV === "production" ? `http://127.0.0.1:${process.env.PORT || 3000}` : req.nextUrl.origin);
+    const file = await screenshot(`${origin}/capture?data=${encodeURIComponent(data)}`, 1080, 1920);
 
     return new Response(new Uint8Array(file), {
       status: 200,

@@ -30,3 +30,15 @@ Invite records for `/create?id=`, `/principal?id=`, `/CUPSAA?id=` live in the `S
 | `/capture`, `/api/capture` | 1080×1920 share image |
 
 See `MIGRATION_NOTES.md` for the 2021 → 2026 upgrade details.
+
+## Deploy (Docker / Dokploy)
+The repo ships a production `Dockerfile` (Next.js standalone server + Chromium for share images).
+
+- **Build type:** Dockerfile (port `3000`).
+- **Environment variables:**
+  - `DATABASE_URL`: the Postgres connection string (required)
+  - `PASSWORD`: the `/filter` admin password
+  - `CAPTURE_ORIGIN` (optional): where `/api/capture` loads `/capture` from. Defaults to the container itself.
+  - `SKIP_MIGRATIONS=1` (optional): skip running migrations on start-up.
+- **On start-up** the container runs `prisma migrate deploy`, then starts the server.
+- **Seed the blocklist** once, from a machine that has the word lists: `DATABASE_URL=… yarn db:seed`.
