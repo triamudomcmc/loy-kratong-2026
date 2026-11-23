@@ -22,14 +22,18 @@ function getRandom<T>(arr: T[], n: number): T[] {
   return result;
 }
 
-/** Oldest 24 displayed entities, then a random 8 of them. */
+/** How many recent displayed kratongs the river draws from, and how many it shows per visit. */
+const SCENE_POOL = 50;
+const SCENE_SHOW = 8;
+
+/** A random SCENE_SHOW of the SCENE_POOL newest displayed kratongs, so new approvals actually reach the river. */
 export async function getSceneEntities(): Promise<AnyResultData[]> {
   const rows = await prisma.kratong.findMany({
     where: { status: "DISPLAYED" },
-    orderBy: { createdAt: "asc" },
-    take: 24,
+    orderBy: { createdAt: "desc" },
+    take: SCENE_POOL,
   });
-  return getRandom(rows, 8).map(
+  return getRandom(rows, SCENE_SHOW).map(
     (row) => ({ kratong: row.kratong, wish: { name: row.wishName, content: row.wishContent } }) as unknown as AnyResultData,
   );
 }
