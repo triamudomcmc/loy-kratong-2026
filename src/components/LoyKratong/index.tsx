@@ -4,7 +4,7 @@ import type { FC } from "react";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import type { ResultData } from "@types-app/kratong";
-import LoyKratongScene from "./loykratong";
+import { RiverScene } from "./river";
 
 export const LoyKratongPage: FC<{ entities: ResultData[] }> = ({ entities }) => {
   const router = useRouter();
@@ -17,7 +17,7 @@ export const LoyKratongPage: FC<{ entities: ResultData[] }> = ({ entities }) => 
 
   return (
     <article>
-      <LoyKratongScene entities={entities} />
+      <RiverScene entities={entities} />
     </article>
   );
 };

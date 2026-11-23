@@ -1,0 +1,21 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="360.486" height="279.508" viewBox="0 0 360.486 279.508" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<foreignObject x="-19.1408" y="-19.1408" width="398.767" height="317.789"><div xmlns="http://www.w3.org/1999/xhtml" style="backdrop-filter:blur(9.57px);clip-path:url(#bgblur_0_0_66_clip_path);height:100%;width:100%"></div></foreignObject><g id="Union" data-figma-bg-blur-radius="19.1408">
+<use xlink:href="#stroke0_0_66" fill="url(#paint0_linear_0_66)" fill-opacity="0.9"/>
+<mask id="stroke1_0_66" fill="white">
+<use xlink:href="#stroke0_0_66"/>
+</mask>
+<path d="M0 15.9507C0 7.14136 7.14137 0 15.9507 0H344.535C353.344 0 360.486 7.14137 360.486 15.9507V242.659C360.486 251.468 353.344 258.609 344.535 258.609H15.9507C7.1414 258.609 0 251.468 0 242.659V15.9507ZM68.3525 279.508L55.9102 258.61H80.7949L68.3525 279.508Z" stroke-width="1.06338" stroke="url(#paint1_linear_0_66)" mask="url(#stroke1_0_66)"/>
+</g>
+<defs>
+<clipPath id="bgblur_0_0_66_clip_path" transform="translate(19.1408 19.1408)"><path fill-rule="evenodd" clip-rule="evenodd" d="M15.9507 0C7.14137 0 0 7.14136 0 15.9507V242.659C0 251.468 7.1414 258.609 15.9507 258.609H344.535C353.344 258.609 360.486 251.468 360.486 242.659V15.9507C360.486 7.14137 353.344 0 344.535 0H15.9507ZM55.9102 258.61L68.3525 279.508L80.7949 258.61H55.9102Z"/>
+</clipPath><linearGradient id="paint0_linear_0_66" x1="360.486" y1="1.36311e-05" x2="5.84791" y2="279.669" gradientUnits="userSpaceOnUse">
+<stop stop-color="white" stop-opacity="0.6"/>
+<stop offset="1" stop-color="white" stop-opacity="0.1"/>
+</linearGradient>
+<linearGradient id="paint1_linear_0_66" x1="180.243" y1="-6.37617e-06" x2="14.355" y2="252.021" gradientUnits="userSpaceOnUse">
+<stop stop-color="white"/>
+<stop offset="1" stop-color="white" stop-opacity="0"/>
+</linearGradient>
+<path id="stroke0_0_66" d="M15.9507 0C7.14137 0 0 7.14136 0 15.9507V242.659C0 251.468 7.1414 258.609 15.9507 258.609H344.535C353.344 258.609 360.486 251.468 360.486 242.659V15.9507C360.486 7.14137 353.344 0 344.535 0H15.9507ZM55.9102 258.61L68.3525 279.508L80.7949 258.61H55.9102Z" fill-rule="evenodd" clip-rule="evenodd"/>
+</defs>
+</svg>
