@@ -10,6 +10,8 @@ interface KratongProps {
   height: string;
   zIndex: number;
   className?: string;
+  /** false = candle without its flame (night share image). Default true. */
+  lit?: boolean;
 }
 
 /**
@@ -19,7 +21,7 @@ interface KratongProps {
  * height above the base bottom; the candle bottom 0.5 x base height above it. Unknown / legacy ids are
  * mapped to defaults (see `normalizeSelected`).
  */
-export function Kratong({ selected, height, zIndex, className }: KratongProps) {
+export function Kratong({ selected, height, zIndex, className, lit = true }: KratongProps) {
   const s = normalizeSelected(selected);
   const base = KratongMap.base[s.base];
   const flower = s.flowers === "none" ? null : KratongMap.flowers[s.flowers];
@@ -42,7 +44,7 @@ export function Kratong({ selected, height, zIndex, className }: KratongProps) {
       </div>
       <div className={kratongCls.candle}>
         {Object.values(KratongMap.candles).map((part) => (
-          <CandlePart key={part.id} part={part} selected={s.candles} base={base} />
+          <CandlePart key={part.id} part={part} selected={s.candles} base={base} lit={lit} />
         ))}
       </div>
       <div className={kratongCls.base}>

@@ -104,13 +104,14 @@ const RIGHT = mk("blue-bowl", "candle-yellow", "none", "none");
  * A kratong standing on the water with its mirror ghost underneath.
  * `cx` = horizontal centre, `bottom` = the base's bottom edge y, `size` = renderer width (--size).
  */
-const Standing: FC<{ selected: KratongSelected; cx: number; bottom: number; size: number; z: number; ghost?: boolean }> = ({
+const Standing: FC<{ selected: KratongSelected; cx: number; bottom: number; size: number; z: number; ghost?: boolean; lit?: boolean }> = ({
   selected,
   cx,
   bottom,
   size,
   z,
   ghost = true,
+  lit = true,
 }) => {
   const h = (size * 2400) / 2048;
   return (
@@ -131,11 +132,11 @@ const Standing: FC<{ selected: KratongSelected; cx: number; bottom: number; size
             maskImage: "linear-gradient(to top, #000 35%, transparent 100%)",
           }}
         >
-          <Kratong selected={selected} height={u(size)} zIndex={1} />
+          <Kratong selected={selected} height={u(size)} zIndex={1} lit={lit} />
         </div>
       )}
       <div className="absolute" style={{ left: u(cx - size / 2), top: u(bottom - h), zIndex: z }}>
-        <Kratong selected={selected} height={u(size)} zIndex={z} />
+        <Kratong selected={selected} height={u(size)} zIndex={z} lit={lit} />
       </div>
     </>
   );
@@ -213,9 +214,9 @@ export const CaptureKratong: FC<{ data: AnyResultData; style?: CaptureStyle }> =
           </Layer>
         )}
 
-        <Standing selected={LEFT} cx={24.6} bottom={448} size={152.5} z={2} />
-        <Standing selected={RIGHT} cx={417.6} bottom={702.5} size={239} z={3} />
-        <Standing selected={data.kratong} cx={215.5} bottom={583} size={300.3} z={5} />
+        <Standing selected={LEFT} cx={24.6} bottom={448} size={152.5} z={2} lit={!night} />
+        <Standing selected={RIGHT} cx={417.6} bottom={702.5} size={239} z={3} lit={!night} />
+        <Standing selected={data.kratong} cx={215.5} bottom={583} size={300.3} z={5} lit={!night} />
 
         {night && (
           <Multiply>

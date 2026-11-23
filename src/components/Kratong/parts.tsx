@@ -45,7 +45,10 @@ const unit = (n: number) => `calc(var(--size) * ${n / UNITS})`;
 const CANDLE_W = 230.6; // canvas width in units (2048px canvas scaled so the 1394px candle = 157 units)
 const CANDLE_H = (CANDLE_W * 2400) / 2048;
 const CANDLE_BBOX_BOTTOM = (CANDLE_H * (2400 - 1394)) / 2400; // transparent strip under the candle in the canvas
-export function CandlePart({ part, selected, base }: KratongNormalPartProps & { base: KratongBaseType }) {
+/** Flame region of the 2048x2400 candle PNG (all colours share it); removed from the image when the candle is unlit. */
+const NO_FLAME = "polygon(evenodd, 0 0, 100% 0, 100% 100%, 0 100%, 0 0, 44.9% 12.5%, 55.7% 12.5%, 55.7% 27.4%, 44.9% 27.4%, 44.9% 12.5%)";
+
+export function CandlePart({ part, selected, base, lit = true }: KratongNormalPartProps & { base: KratongBaseType; lit?: boolean }) {
   const lift = base.height * (base.candleLift ?? 0.5);
   return (
     <img
@@ -56,6 +59,7 @@ export function CandlePart({ part, selected, base }: KratongNormalPartProps & { 
         width: unit(CANDLE_W),
         left: unit(UNITS / 2 - 22.7 - CANDLE_W / 2),
         bottom: unit(lift - CANDLE_BBOX_BOTTOM),
+        clipPath: lit ? undefined : NO_FLAME,
       }}
       src={part.url}
       alt={part.name}
@@ -63,13 +67,18 @@ export function CandlePart({ part, selected, base }: KratongNormalPartProps & { 
   );
 }
 
-/** Flower sitting on the base: bottom-centred, bottom edge 0.485 x base height above the base bottom. */
+/** Petals rise this many units above the base's top edge (Figma 187:966: flower top 59 units above the base top). */
+const FLOWER_RISE = 59;
+
+/** Flower on the base: bottom-centred, its top FLOWER_RISE units above the base top so it always reads clearly in front of the base's tips. */
 export function FlowerPart({ part, base }: { part: KratongFlowerType; base: KratongBaseType }) {
+  const h = (part.fit * part.height) / part.width;
+  const bottom = Math.max(0, base.height + FLOWER_RISE - h);
   return (
     <img
       draggable={false}
       className="absolute left-1/2 max-w-none -translate-x-1/2 select-none"
-      style={{ width: unit(part.fit), bottom: unit(base.height * (base.flowerLift ?? 0.485)) }}
+      style={{ width: unit(part.fit), bottom: unit(bottom) }}
       src={part.url}
       alt={part.name}
     />

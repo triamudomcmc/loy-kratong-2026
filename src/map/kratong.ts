@@ -33,8 +33,7 @@ export type KratongType = {
 export type KratongBaseType = KratongType & {
   width: number;
   height: number;
-  /** Bottom edge of the flower / candle as a fraction of the base height above the base bottom (defaults .485 / .5, from Figma 187:966). */
-  flowerLift?: number;
+  /** Bottom edge of the candle as a fraction of the base height above the base bottom (default .5, from Figma 187:966). */
   candleLift?: number;
 };
 
@@ -128,7 +127,6 @@ export const KratongMap: KratongMapType = {
       thumbnail: "/assets/kratong-v2/bases/blue-bowl.svg",
       width: 312,
       height: 128,
-      flowerLift: 0.7,
       candleLift: 0.68,
     },
     "pink-lotus": {
@@ -316,7 +314,7 @@ export const KratongMap: KratongMapType = {
       thumbnail: "/assets/kratong-v2/flowers/pink-lotus.svg",
       width: 225,
       height: 76,
-      fit: 300,
+      fit: 320,
     },
     "pink-blossom": {
       id: "pink-blossom",
@@ -327,7 +325,7 @@ export const KratongMap: KratongMapType = {
       thumbnail: "/assets/kratong-v2/flowers/pink-blossom.svg",
       width: 195,
       height: 70,
-      fit: 270,
+      fit: 300,
     },
     "purple-cream": {
       id: "purple-cream",
