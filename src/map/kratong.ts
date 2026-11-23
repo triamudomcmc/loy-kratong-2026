@@ -130,8 +130,9 @@ export const FLOWER_TUNE: Partial<Record<BaseId, Partial<Record<FlowerId, { dy?:
     "purple-cream": { dy: -12 }, // #14
   },
   "orange-lotus": {
-    "pink-blossom": { dy: 8 }, // #23
-    frangipani: { dy: 8 }, // #25
+    "pink-blossom": { dy: 0, scale: 0.9 }, // #23
+    "purple-cream": { dy: 10 }, // #24
+    frangipani: { dy: 0, scale: 0.9 }, // #25
   },
 };
 
@@ -178,8 +179,6 @@ export const KratongMap: KratongMapType = {
       thumbnail: "/assets/kratong-v2/bases/pink-lotus.svg",
       width: 305,
       height: 159,
-      // lotus cup: flowers sit in its heart, in front of the back petals
-      open: { surface: 74, flowerMax: 0.78 },
     },
     "orange-lotus": {
       id: "orange-lotus",
