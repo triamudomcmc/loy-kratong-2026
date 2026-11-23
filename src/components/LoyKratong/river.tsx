@@ -55,7 +55,7 @@ const isEntity = (d: unknown): d is ResultData =>
   !!d && typeof d === "object" && "kratong" in d && "wish" in d && !!(d as ResultData).kratong && !!(d as ResultData).wish;
 
 function buildItems(entities: ResultData[], own: ResultData | null): Item[] {
-  const shuffled = shuffle(entities);
+  const shuffled = shuffle(entities.filter((e) => kindOf(e) !== null)); // principal / CUPSAA rows are no longer shown
   const back: ResultData[] = [];
   const mid: ResultData[] = [];
   const front: ResultData[] = [];
@@ -77,10 +77,10 @@ function buildItems(entities: ResultData[], own: ResultData | null): Item[] {
       own: it.own,
     }));
   };
-  const ent = (prefix: string, e: ResultData, i: number) => ({ id: `${prefix}-${i}`, kind: kindOf(e), data: e });
+  const ent = (prefix: string, e: ResultData, i: number) => ({ id: `${prefix}-${i}`, kind: "normal" as RiverKind, data: e });
 
   const frontList = [
-    ...(own ? [{ id: "own", kind: kindOf(own), data: own, own: true }] : []),
+    ...(own ? [{ id: "own", kind: "normal" as RiverKind, data: own, own: true }] : []),
     ...(!own && front.length ? [ent("f", front.shift() as ResultData, 0)] : []),
     ...front.map((e, i) => ent("f", e, i + 1)),
   ];

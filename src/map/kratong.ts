@@ -29,6 +29,18 @@ export type KratongType = {
   thumbnail?: string;
 };
 
+/** New SVG base: `width`/`height` are the SVG's own size (design px). */
+export type KratongBaseType = KratongType & {
+  width: number;
+  height: number;
+  /** Bottom edge of the flower / candle as a fraction of the base height above the base bottom (defaults .485 / .5, from Figma 187:966). */
+  flowerLift?: number;
+  candleLift?: number;
+};
+
+/** New SVG flower: `width`/`height` natural size, `fit` = rendered width in the 341-unit kratong box. */
+export type KratongFlowerType = KratongBaseType & { fit: number };
+
 export type KratongTypeVariant = {
   name: string;
   description: string;
@@ -39,14 +51,7 @@ export type KratongTypeVariant = {
 };
 
 export interface KratongMapType {
-  base: {
-    "coconut-shell-carved": KratongType;
-    "banana-leaf-2": KratongType;
-    "coconut-shell": KratongType;
-    lotus: KratongType;
-    ice: KratongType;
-    "banana-leaf": KratongType;
-  };
+  base: Record<BaseId, KratongBaseType>;
   decorations: {
     none: KratongType;
     "sign-quote": KratongTypeVariant;
@@ -58,12 +63,7 @@ export interface KratongMapType {
     "sign-want-love": KratongTypeVariant;
     "sign-want-money": KratongTypeVariant;
   };
-  flowers: {
-    love: KratongType;
-    study: KratongType;
-    luck: KratongType;
-    "summer-fruits": KratongType;
-  };
+  flowers: Record<FlowerId, KratongFlowerType>;
   candles: {
     orange: KratongType;
     pink: KratongType;
@@ -74,55 +74,82 @@ export interface KratongMapType {
   };
 }
 
+export type BaseId = "green-lotus-large" | "green-lotus" | "blue-bowl" | "pink-lotus" | "orange-lotus";
+export type FlowerId = "lotus-marigold" | "pink-lotus" | "pink-blossom" | "purple-cream" | "frangipani";
+
+export const DEFAULT_BASE: BaseId = "green-lotus-large";
+export const DEFAULT_FLOWER: FlowerId = "lotus-marigold";
+export const DEFAULT_CANDLE = "candle-yellow";
+
+/** Old ids (DB rows, localStorage) -> the new part that stands in for them. */
+export const LEGACY_BASE: Record<string, BaseId> = {
+  "banana-leaf": "green-lotus",
+  "banana-leaf-2": "green-lotus-large",
+  lotus: "pink-lotus",
+  "coconut-shell": "orange-lotus",
+  "coconut-shell-carved": "orange-lotus",
+  ice: "blue-bowl",
+};
+export const LEGACY_FLOWER: Record<string, FlowerId> = {
+  love: "pink-lotus",
+  luck: "lotus-marigold",
+  study: "purple-cream",
+  "summer-fruits": "frangipani",
+};
+
 export const KratongMap: KratongMapType = {
   base: {
-    "banana-leaf": {
-      id: "banana-leaf",
+    "green-lotus-large": {
+      id: "green-lotus-large",
       type: "normal",
-      name: "ใบตอง",
+      name: "ใบตองบัวใหญ่",
       description: "คำอธิบาย",
-      url: "/assets/images/kratong/base/banana-leaf.png",
-      thumbnail: "/assets/images/kratong/thumbnail/base/banana-leaf.png",
+      url: "/assets/kratong-v2/bases/green-lotus-large.svg",
+      thumbnail: "/assets/kratong-v2/bases/green-lotus-large.svg",
+      width: 341,
+      height: 169,
     },
-    lotus: {
-      id: "lotus",
+    "green-lotus": {
+      id: "green-lotus",
       type: "normal",
-      name: "ดอกบัว",
+      name: "ใบตองบัว",
       description: "คำอธิบาย",
-      url: "/assets/images/kratong/base/lotus.png",
-      thumbnail: "/assets/images/kratong/thumbnail/base/lotus.png",
+      url: "/assets/kratong-v2/bases/green-lotus.svg",
+      thumbnail: "/assets/kratong-v2/bases/green-lotus.svg",
+      width: 336,
+      height: 138,
     },
-    "coconut-shell": {
-      id: "coconut-shell",
+    "blue-bowl": {
+      id: "blue-bowl",
       type: "normal",
-      name: "กะลามะพร้าว",
+      name: "ชามสีฟ้า",
       description: "คำอธิบาย",
-      url: "/assets/images/kratong/base/coconut-shell.png",
-      thumbnail: "/assets/images/kratong/thumbnail/base/coconut-shell.png",
+      url: "/assets/kratong-v2/bases/blue-bowl.svg",
+      thumbnail: "/assets/kratong-v2/bases/blue-bowl.svg",
+      width: 312,
+      height: 128,
+      flowerLift: 0.7,
+      candleLift: 0.68,
     },
-    "coconut-shell-carved": {
-      id: "coconut-shell-carved",
+    "pink-lotus": {
+      id: "pink-lotus",
       type: "normal",
-      name: "กาบมะพร้าว",
+      name: "บัวชมพู",
       description: "คำอธิบาย",
-      url: "/assets/images/kratong/base/coconut-shell-carved.png",
-      thumbnail: "/assets/images/kratong/thumbnail/base/coconut-shell-carved.png",
+      url: "/assets/kratong-v2/bases/pink-lotus.svg",
+      thumbnail: "/assets/kratong-v2/bases/pink-lotus.svg",
+      width: 305,
+      height: 159,
     },
-    ice: {
-      id: "ice",
+    "orange-lotus": {
+      id: "orange-lotus",
       type: "normal",
-      name: "น้ำแข็ง",
+      name: "บัวสีส้ม",
       description: "คำอธิบาย",
-      url: "/assets/images/kratong/base/ice.png",
-      thumbnail: "/assets/images/kratong/thumbnail/base/ice.png",
-    },
-    "banana-leaf-2": {
-      id: "banana-leaf-2",
-      type: "normal",
-      name: "ใบตองเหลี่ยม",
-      description: "คำอธิบาย",
-      url: "/assets/images/kratong/base/banana-leaf-2.png",
-      thumbnail: "/assets/images/kratong/thumbnail/base/banana-leaf-2.png",
+      url: "/assets/kratong-v2/bases/orange-lotus.svg",
+      thumbnail: "/assets/kratong-v2/bases/orange-lotus.svg",
+      width: 324,
+      height: 139,
     },
   },
   decorations: {
@@ -269,37 +296,60 @@ export const KratongMap: KratongMapType = {
     },
   },
   flowers: {
-    love: {
-      id: "love",
+    "lotus-marigold": {
+      id: "lotus-marigold",
       type: "normal",
-      name: "ชุดความรัก",
+      name: "บัวชมพูดาวเรือง",
       description: "คำอธิบาย",
-      url: "/assets/images/kratong/flowers/love.png",
-      thumbnail: "/assets/images/kratong/thumbnail/flowers/love.png",
+      url: "/assets/kratong-v2/flowers/lotus-marigold.svg",
+      thumbnail: "/assets/kratong-v2/flowers/lotus-marigold.svg",
+      width: 236,
+      height: 119,
+      fit: 289,
     },
-    luck: {
-      id: "luck",
+    "pink-lotus": {
+      id: "pink-lotus",
       type: "normal",
-      name: "ชุดหนทางสู่เศรษฐี",
+      name: "บัวชมพูกลีบเรียง",
       description: "คำอธิบาย",
-      url: "/assets/images/kratong/flowers/luck.png",
-      thumbnail: "/assets/images/kratong/thumbnail/flowers/luck.png",
+      url: "/assets/kratong-v2/flowers/pink-lotus.svg",
+      thumbnail: "/assets/kratong-v2/flowers/pink-lotus.svg",
+      width: 225,
+      height: 76,
+      fit: 300,
     },
-    "summer-fruits": {
-      id: "summer-fruits",
+    "pink-blossom": {
+      id: "pink-blossom",
       type: "normal",
-      name: "ชุดรวมมิตรผลไม้ฤดูร้อน",
+      name: "ดอกไม้ชมพูม่วง",
       description: "คำอธิบาย",
-      url: "/assets/images/kratong/flowers/summer-fruits.png",
-      thumbnail: "/assets/images/kratong/thumbnail/flowers/summer-fruits.png",
+      url: "/assets/kratong-v2/flowers/pink-blossom.svg",
+      thumbnail: "/assets/kratong-v2/flowers/pink-blossom.svg",
+      width: 195,
+      height: 70,
+      fit: 270,
     },
-    study: {
-      id: "study",
+    "purple-cream": {
+      id: "purple-cream",
       type: "normal",
-      name: "ชุดการเรียน",
+      name: "บัวม่วงครีม",
       description: "คำอธิบาย",
-      url: "/assets/images/kratong/flowers/study.png",
-      thumbnail: "/assets/images/kratong/thumbnail/flowers/study.png",
+      url: "/assets/kratong-v2/flowers/purple-cream.svg",
+      thumbnail: "/assets/kratong-v2/flowers/purple-cream.svg",
+      width: 238,
+      height: 140,
+      fit: 250,
+    },
+    "frangipani": {
+      id: "frangipani",
+      type: "normal",
+      name: "ลีลาวดี",
+      description: "คำอธิบาย",
+      url: "/assets/kratong-v2/flowers/frangipani.svg",
+      thumbnail: "/assets/kratong-v2/flowers/frangipani.svg",
+      width: 328,
+      height: 110,
+      fit: 300,
     },
   },
   candles: {
@@ -354,270 +404,35 @@ export const KratongMap: KratongMapType = {
   },
 };
 
-interface PrincipalMapType {
-  base: {
-    blue: KratongType;
-    indigo: KratongType;
-    pink: KratongType;
-    violet: KratongType;
-  };
-  candles: {
-    blue: KratongType;
-    green: KratongType;
-    pink: KratongType;
-    red: KratongType;
-  };
-  decorations: {
-    rice1: KratongType;
-    rice2: KratongType;
-  };
-  swan: {
-    blue: KratongType;
-    green: KratongType;
-    pink: KratongType;
-    yellow: KratongType;
-  };
+/** Maps any base id (new, legacy or unknown) to a current base id. */
+export function resolveBase(id: unknown): BaseId {
+  if (typeof id === "string") {
+    if (id in KratongMap.base) return id as BaseId;
+    if (id in LEGACY_BASE) return LEGACY_BASE[id];
+  }
+  return DEFAULT_BASE;
 }
 
-export const PrincipalMap: PrincipalMapType = {
-  base: {
-    blue: {
-      type: "normal",
-      id: "base-blue",
-      name: "สีฟ้า",
-      description: "คำอธิบาย",
-      url: "/assets/images/principal/base/blue.png",
-    },
-    indigo: {
-      type: "normal",
-      id: "base-indigo",
-      name: "สีคราม",
-      description: "คำอธิบาย",
-      url: "/assets/images/principal/base/indigo.png",
-    },
-    pink: {
-      type: "normal",
-      id: "base-pink",
-      name: "สีชมพู",
-      description: "คำอธิบาย",
-      url: "/assets/images/principal/base/pink.png",
-    },
-    violet: {
-      type: "normal",
-      id: "base-violet",
-      name: "สีม่วง",
-      description: "คำอธิบาย",
-      url: "/assets/images/principal/base/violet.png",
-    },
-  },
-  candles: {
-    blue: {
-      type: "normal",
-      id: "candle-blue",
-      name: "สีฟ้า",
-      description: "คำอธิบาย",
-      url: "/assets/images/principal/candles/blue.png",
-    },
-    green: {
-      type: "normal",
-      id: "candle-green",
-      name: "สีเขียว",
-      description: "คำอธิบาย",
-      url: "/assets/images/principal/candles/green.png",
-    },
-    pink: {
-      type: "normal",
-      id: "candle-pink",
-      name: "สีชมพู",
-      description: "คำอธิบาย",
-      url: "/assets/images/principal/candles/pink.png",
-    },
-    red: {
-      type: "normal",
-      id: "candle-orange",
-      name: "สีส้ม",
-      description: "คำอธิบาย",
-      url: "/assets/images/principal/candles/orange.png",
-    },
-  },
-  decorations: {
-    rice1: {
-      type: "normal",
-      id: "rice1",
-      name: "ข้าวรูปวงกลม",
-      description: "คำอธิบาย",
-      url: "/assets/images/principal/rice/rice1.png",
-    },
-    rice2: {
-      type: "normal",
-      id: "rice2",
-      name: "ข้าวรูปหัวใจ",
-      description: "คำอธิบาย",
-      url: "/assets/images/principal/rice/rice2.png",
-    },
-  },
-  swan: {
-    blue: {
-      type: "normal",
-      id: "swan-blue",
-      name: "สีฟ้า",
-      description: "คำอธิบาย",
-      url: "/assets/images/principal/swan/blue.png",
-    },
-    green: {
-      type: "normal",
-      id: "swan-green",
-      name: "สีเขียว",
-      description: "คำอธิบาย",
-      url: "/assets/images/principal/swan/green.png",
-    },
-    pink: {
-      type: "normal",
-      id: "swan-pink",
-      name: "สีชมพู",
-      description: "คำอธิบาย",
-      url: "/assets/images/principal/swan/pink.png",
-    },
-    yellow: {
-      type: "normal",
-      id: "swan-yellow",
-      name: "สีเหลือง",
-      description: "คำอธิบาย",
-      url: "/assets/images/principal/swan/yellow.png",
-    },
-  },
-};
-
-interface CUPSAAMapType {
-  base: {
-    blue: KratongType;
-    orange: KratongType;
-    pink: KratongType;
-    lilac: KratongType;
-    lavender: KratongType;
-  };
-  flowers: {
-    blue: KratongType;
-    orange: KratongType;
-    pink: KratongType;
-    violet: KratongType;
-    yellow: KratongType;
-  };
-  candles: {
-    blue: KratongType;
-    pink: KratongType;
-    violet: KratongType;
-    yellow: KratongType;
-  };
+/** Maps any flower id (new, legacy or unknown) to a current flower id. */
+export function resolveFlower(id: unknown): FlowerId | "none" {
+  if (id === "none") return "none"; // no flower: only for fixed scenes (story); the builder never offers it
+  if (typeof id === "string") {
+    if (id in KratongMap.flowers) return id as FlowerId;
+    if (id in LEGACY_FLOWER) return LEGACY_FLOWER[id];
+  }
+  return DEFAULT_FLOWER;
 }
 
-export const CUPSAAMap: CUPSAAMapType = {
-  base: {
-    blue: {
-      type: "normal",
-      id: "base-blue",
-      name: "สีฟ้า",
-      description: "คำอธิบาย",
-      url: "/assets/images/CUPSAA/base/blue.png",
-    },
-    orange: {
-      type: "normal",
-      id: "base-orange",
-      name: "สีส้ม",
-      description: "คำอธิบาย",
-      url: "/assets/images/CUPSAA/base/orange.png",
-    },
-    pink: {
-      type: "normal",
-      id: "base-pink",
-      name: "สีชมพู",
-      description: "คำอธิบาย",
-      url: "/assets/images/CUPSAA/base/pink.png",
-    },
-    lilac: {
-      type: "normal",
-      id: "base-lilac",
-      name: "สีม่วงชมพู",
-      description: "คำอธิบาย",
-      url: "/assets/images/CUPSAA/base/lilac.png",
-    },
-    lavender: {
-      type: "normal",
-      id: "base-lavender",
-      name: "สีม่วงลาเวนเดอร์",
-      description: "คำอธิบาย",
-      url: "/assets/images/CUPSAA/base/lavender.png",
-    },
-  },
-  flowers: {
-    blue: {
-      type: "normal",
-      id: "flower-blue",
-      name: "สีฟ้า",
-      description: "คำอธิบาย",
-      url: "/assets/images/CUPSAA/flowers/blue.png",
-    },
-    orange: {
-      type: "normal",
-      id: "flower-orange",
-      name: "สีส้ม",
-      description: "คำอธิบาย",
-      url: "/assets/images/CUPSAA/flowers/orange.png",
-    },
-    pink: {
-      type: "normal",
-      id: "flower-pink",
-      name: "สีชมพู",
-      description: "คำอธิบาย",
-      url: "/assets/images/CUPSAA/flowers/pink.png",
-    },
-    violet: {
-      type: "normal",
-      id: "flower-violet",
-      name: "สีม่วง",
-      description: "คำอธิบาย",
-      url: "/assets/images/CUPSAA/flowers/violet.png",
-    },
-    yellow: {
-      type: "normal",
-      id: "flower-yellow",
-      name: "สีเหลือง",
-      description: "คำอธิบาย",
-      url: "/assets/images/CUPSAA/flowers/yellow.png",
-    },
-  },
-  candles: {
-    blue: {
-      type: "normal",
-      id: "candle-blue",
-      name: "สีฟ้า",
-      description: "คำอธิบาย",
-      url: "/assets/images/CUPSAA/candles/blue.png",
-      thumbnail: "/assets/images/CUPSAA/thumbnail/candles/blue.png",
-    },
-    pink: {
-      type: "normal",
-      id: "candle-pink",
-      name: "สีชมพู",
-      description: "คำอธิบาย",
-      url: "/assets/images/CUPSAA/candles/pink.png",
-      thumbnail: "/assets/images/CUPSAA/thumbnail/candles/pink.png",
-    },
-    violet: {
-      type: "normal",
-      id: "candle-violet",
-      name: "สีม่วง",
-      description: "คำอธิบาย",
-      url: "/assets/images/CUPSAA/candles/violet.png",
-      thumbnail: "/assets/images/CUPSAA/thumbnail/candles/violet.png",
-    },
-    yellow: {
-      type: "normal",
-      id: "candle-yellow",
-      name: "สีเหลือง",
-      description: "คำอธิบาย",
-      url: "/assets/images/CUPSAA/candles/yellow.png",
-      thumbnail: "/assets/images/CUPSAA/thumbnail/candles/yellow.png",
-    },
-  },
-};
+/** Unknown candle ids fall back to the yellow candle. */
+export function resolveCandle(id: unknown): string {
+  return Object.values(KratongMap.candles).some((c) => c.id === id) ? (id as string) : DEFAULT_CANDLE;
+}
+
+/** Normalises a stored selection (old DB rows / localStorage) so every part id exists. */
+export function normalizeSelected<T extends { base?: unknown; flowers?: unknown; candles?: unknown; decorations?: unknown; signVariant?: unknown }>(
+  s: T,
+): { base: BaseId; flowers: FlowerId | "none"; candles: string; decorations: string; signVariant: number } {
+  const dec = typeof s.decorations === "string" && s.decorations in KratongMap.decorations ? s.decorations : "none";
+  const sv = typeof s.signVariant === "number" && s.signVariant >= 0 && s.signVariant < 6 ? s.signVariant : 0;
+  return { base: resolveBase(s.base), flowers: resolveFlower(s.flowers), candles: resolveCandle(s.candles), decorations: dec, signVariant: sv };
+}

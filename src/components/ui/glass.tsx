@@ -1,15 +1,10 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Layer, u } from "./frame";
 import { Logo } from "./logo";
-import { MobileScenery } from "./scenery";
-import { Moon } from "./moon";
 import { TealSky } from "./sky";
 
 /** `--u` of the foreground stage: the 375 x 812 design fits the viewport (contain). */
 export const STAGE_U = "calc(min(100vw / 375, 100dvh / 812))";
-/** `--u` of the scenery: the design covers the viewport, so the scene never shows empty sides. */
-const COVER_U = "calc(max(100vw / 735, 100dvh / 812))";
-
 /**
  * A 375 x 812 design frame centred in its (positioned) parent and scaled to fit it (`--u` = STAGE_U),
  * so the card keeps its Figma size at every viewport without scrolling.
@@ -26,35 +21,18 @@ export function StageFrame({ className = "", children }: { className?: string; c
 }
 
 /**
- * Pink/purple glass backdrop of Scene 5 / 6 (Figma Scene 5 91:715), filling the whole viewport:
- * teal sky + Scene-4 scenery (layered water, cover-scaled and bottom-anchored) + small moon,
- * covered by the "bg" gradient (264.4deg red to blue, backdrop blur 14) and the logo nav.
- * At 375 x 812 every layer sits at its exact Figma coordinates. Render it first, inside a
- * `fixed inset-0` / positioned parent.
+ * Blue glass backdrop of Scene 19 / 20 / 21 and the save modal (Figma Scene 19 187:551, "bg" 187:566), filling the whole
+ * viewport: the blue sky gradient (183.82deg, #4ed1d8 -> #1286b1) with backdrop-blur 14, which hides everything behind it,
+ * and the logo nav. Render it first, inside a `fixed inset-0` / positioned parent.
  */
 export function GlassBackdrop({ nav = true }: { nav?: boolean }) {
   return (
     <>
-      <div className="absolute inset-0 overflow-hidden">
+      <div className="absolute inset-0 overflow-hidden" style={{ ["--u" as string]: STAGE_U }}>
         <TealSky />
-        {/* scenery: scaled to cover, centred horizontally, anchored to the bottom */}
-        <div
-          className="absolute bottom-0 left-1/2"
-          style={{ ["--u" as string]: COVER_U, width: u(375), height: u(812), marginLeft: u(-187.5) }}
-        >
-          <MobileScenery water="layered" />
-        </div>
-        <StageFrame>
-          <Moon glow={{ x: 210, y: 90, size: 99 }} body={{ x: 214, y: 93, size: 92 }} />
-        </StageFrame>
         <div
           className="absolute inset-0"
-          style={{
-            ["--u" as string]: STAGE_U,
-            backgroundImage: "linear-gradient(264.4121deg, rgba(255,112,112,0.71) 0%, rgba(0,34,210,0.67) 110.41%)",
-            backdropFilter: `blur(${u(14)})`,
-            WebkitBackdropFilter: `blur(${u(14)})`,
-          }}
+          style={{ backdropFilter: `blur(${u(14)})`, WebkitBackdropFilter: `blur(${u(14)})` }}
         />
       </div>
       {nav && (

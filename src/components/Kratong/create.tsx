@@ -3,7 +3,7 @@
 import type { FC } from "react";
 import { useState } from "react";
 import { Kratong } from "./kratong";
-import { KratongMap, KratongType, KratongTypeVariant } from "@map/kratong";
+import { DEFAULT_BASE, DEFAULT_FLOWER, KratongMap, normalizeSelected, KratongType, KratongTypeVariant } from "@map/kratong";
 import { pushKratong } from "@server/actions";
 import { useRouter } from "next/navigation";
 import { u } from "@components/ui";
@@ -212,11 +212,11 @@ export type { KratongData };
 export const Create: FC<{ idata?: KratongData | null }> = ({ idata }) => {
   const [data, setData] = useState<KratongData>(
     idata && Object.keys(idata).length > 1
-      ? idata
+      ? { ...idata, kratong: normalizeSelected(idata.kratong) }
       : {
           kratong: {
-            base: "banana-leaf",
-            flowers: "love",
+            base: DEFAULT_BASE,
+            flowers: DEFAULT_FLOWER,
             candles: "candle-yellow",
             decorations: "none",
             signVariant: 0,

@@ -35,11 +35,11 @@ export function Cloud({
   drift?: boolean | number;
   driftDuration?: number;
   driftDelay?: number;
-  /** override the file path (defaults to the shared clouds folder) */
+  /** override the file path (defaults to `public/assets/figma-v2/story/<name>.svg`) */
   src?: string;
 }) {
   const reduce = useReducedMotion();
-  const file = src ?? `/assets/figma/ui/clouds/${name}.svg`;
+  const file = src ?? `/assets/figma-v2/story/${name}.svg`;
   const amp = drift ? (drift === true ? 5 : drift) * (reduce ? 0.33 : 1) : 0;
   return (
     <Layer x={x} y={y} w={w} h={h} style={{ transform: rotate ? `rotate(${rotate}deg)` : undefined, opacity }}>

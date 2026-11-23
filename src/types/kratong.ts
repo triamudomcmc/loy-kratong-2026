@@ -15,41 +15,14 @@ export interface KratongSelected {
   signVariant: number;
 }
 
-/** Principal's kratong (Principal/create.tsx) */
-export interface PrincipalSelected {
-  base: string;
-  swan: string;
-  candles: string;
-  decorations: string;
-}
-
-/** CUPSAA kratong (CUPSAA/create.tsx) */
-export interface CupsaaSelected {
-  base: string;
-  flowers: string;
-  candles: string;
-}
-
 export interface ResultData {
   kratong: KratongSelected;
   wish: Wish;
 }
 
-export interface PrincipalResultData {
-  kratong: PrincipalSelected;
-  wish: Wish;
-}
-
-export interface CupsaaResultData {
-  kratong: CupsaaSelected;
-  wish: Wish;
-}
-
 export type KratongData = ResultData;
-export type PrincipalKratongData = PrincipalResultData;
-export type CupsaaKratongData = CupsaaResultData;
-
-export type AnyResultData = ResultData | PrincipalResultData | CupsaaResultData;
+/** Kept as an alias: only standard kratongs exist now. */
+export type AnyResultData = ResultData;
 
 /** Common return shape of all server actions. */
 export type ActionResult<T = undefined> =

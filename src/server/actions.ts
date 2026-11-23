@@ -52,37 +52,6 @@ export async function pushKratong({
   }
 }
 
-export async function sendData({
-  id,
-  data,
-  kind,
-}: {
-  id: string;
-  data: AnyResultData;
-  kind: "PRINCIPAL" | "CUPSAA";
-}): Promise<{ status: true; report: "success" } | { status: false; report: "invalidData" | "unexpected_error" }> {
-  if (!data || !id) return { status: false, report: "invalidData" };
-  try {
-    // Upsert on the invite id so client retries / refreshes never create duplicates.
-    const fields = {
-      kind,
-      status: "DISPLAYED" as const,
-      kratong: data.kratong as unknown as Prisma.InputJsonValue,
-      wishName: data.wish?.name ?? "",
-      wishContent: data.wish?.content ?? "",
-    };
-    await prisma.kratong.upsert({
-      where: { sourceId: id },
-      create: { ...fields, sourceId: id },
-      update: fields,
-    });
-    return { status: true, report: "success" };
-  } catch (e) {
-    console.error("sendData failed", e);
-    return { status: false, report: "unexpected_error" };
-  }
-}
-
 export async function loadFilterList({ password }: { password: string }): Promise<
   | { status: true; report: "success"; data: { raw: EntityRecord[]; archived: EntityRecord[]; display: EntityRecord[] } }
   | { status: false; report: "access_denied" | "unexpected_error" }

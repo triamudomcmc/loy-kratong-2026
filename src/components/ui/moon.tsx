@@ -9,41 +9,41 @@ interface Box {
   size: number;
 }
 
-/** Glow art is a blurred circle; the SVG bleeds past the layer by `inset` percent (negative inset in Figma). */
-const GLOWS: Record<number, { src: string; inset: number }> = {
-  253: { src: "/assets/figma/ui/moon-glow-253.svg", inset: 13.04 }, // ปก, Scene 1
-  279: { src: "/assets/figma/ui/moon-glow-279.svg", inset: 11.83 }, // Scene 2, 3
-  99: { src: "/assets/figma/ui/moon-glow-99.svg", inset: 33.33 }, // Scene 4, 5
-  202: { src: "/assets/figma/ui/moon-glow-202.svg", inset: 19.97 }, // Scene 17
-};
+const V2 = "/assets/figma-v2/story";
+/** The glow is one blurred-circle SVG (cover Ellipse 133, 253 design px); it bleeds 13.04% past its layer (negative Figma inset). */
+const GLOW_SRC = `${V2}/moon-glow-253.svg`;
+const GLOW_INSET = 13.04;
+/** The orange-cat moon art (cover Group 6297); the SVG bleeds 1.35% past the body layer. */
+const MOON_SRC = `${V2}/moon-cat.svg`;
+const MOON_INSET = 1.35;
 
-/** Moon (Figma "Mooooon 2" + "Ellipse 13x" glow). `glow.size` must be 253, 279, 99 or 202. */
-export function Moon({ glow, body }: { glow: Box; body: Box }) {
-  const g = GLOWS[glow.size];
+function Glow() {
   return (
-    <>
-      <Layer x={glow.x} y={glow.y} w={glow.size} h={glow.size}>
-        <div className="absolute" style={{ inset: `-${g.inset}%` }}>
-          <img alt="" className="block size-full max-w-none" src={g.src} />
-        </div>
-      </Layer>
-      <Layer x={body.x} y={body.y} w={body.size} h={body.size}>
-        <img
-          alt="ดวงจันทร์"
-          className="absolute inset-0 size-full max-w-none object-cover pointer-events-none"
-          src="/assets/figma/ui/moon.gif"
-        />
-      </Layer>
-    </>
+    <div className="absolute" style={{ inset: `-${GLOW_INSET}%` }}>
+      <img alt="" className="block size-full max-w-none" src={GLOW_SRC} />
+    </div>
   );
 }
 
-/** The small yellow rabbit-ear piece layered over the moon in Scene 2 / Scene 3 (Union 91:515, 91:529). */
-export function MoonRabbitEar() {
+function Body() {
   return (
-    <Layer x={158} y={280} w={57} h={110.712}>
-      <img alt="" className="absolute block inset-0 size-full max-w-none" src="/assets/figma/ui/moon-rabbit-ear.svg" />
-    </Layer>
+    <div className="absolute pointer-events-none" style={{ inset: `-${MOON_INSET}%` }}>
+      <img alt="ดวงจันทร์" className="block size-full max-w-none" src={MOON_SRC} />
+    </div>
+  );
+}
+
+/** Moon (orange cat): blurred glow circle + body, at any size. `glow` / `body` are frame-coordinate boxes. */
+export function Moon({ glow, body }: { glow: Box; body: Box }) {
+  return (
+    <>
+      <Layer x={glow.x} y={glow.y} w={glow.size} h={glow.size}>
+        <Glow />
+      </Layer>
+      <Layer x={body.x} y={body.y} w={body.size} h={body.size}>
+        <Body />
+      </Layer>
+    </>
   );
 }
 
@@ -53,8 +53,8 @@ export interface MoonPose {
   body: Box;
 }
 
-/** The cover pose (glow 253 / body 257) every MovingMoon is laid out at before it is transformed to a pose. */
-const BASE = { glow: { x: 60, y: 113, size: 253 }, body: { x: 59, y: 109, size: 257 } };
+/** The cover pose (glow 253 / body 257, Figma 187:476 / 195:629) every MovingMoon is laid out at before it is transformed to a pose. */
+const BASE = { glow: { x: 60, y: 113, size: 253 }, body: { x: 60, y: 113, size: 257 } };
 
 function toTransform(base: Box, to: Box) {
   const dx = to.x + to.size / 2 - (base.x + base.size / 2);
@@ -79,24 +79,17 @@ export function MovingMoon({
 }) {
   const reduce = useReducedMotion();
   const t = { duration: reduce ? 0.2 : duration, ease: [0.45, 0, 0.2, 1] as [number, number, number, number] };
-  const g = GLOWS[253];
   return (
     <>
       <Layer x={BASE.glow.x} y={BASE.glow.y} w={253} h={253}>
         <motion.div className="absolute inset-0" initial={false} animate={toTransform(BASE.glow, pose.glow)} transition={t}>
-          <div className="absolute" style={{ inset: `-${g.inset}%` }}>
-            <img alt="" className="block size-full max-w-none" src={g.src} />
-          </div>
+          <Glow />
         </motion.div>
       </Layer>
       <Layer x={BASE.body.x} y={BASE.body.y} w={BASE.body.size} h={BASE.body.size}>
         <motion.div className="absolute inset-0" initial={false} animate={toTransform(BASE.body, pose.body)} transition={t}>
           <MoonFloat float={reduce ? 0 : float}>
-            <img
-              alt="ดวงจันทร์"
-              className="absolute inset-0 size-full max-w-none object-cover pointer-events-none"
-              src="/assets/figma/ui/moon.gif"
-            />
+            <Body />
           </MoonFloat>
         </motion.div>
       </Layer>

@@ -1,85 +1,53 @@
-import { KratongMap } from "@map/kratong";
+import { KratongMap, normalizeSelected } from "@map/kratong";
 import { kratongCls } from "@components/kratong-classes";
-import { NormalPart, VariantPart, Candle } from "./parts";
-import { Selected } from "./create";
+import { BasePart, CandlePart, FlowerPart, NormalPart, VariantPart } from "./parts";
+import type { Selected } from "./create";
 import clsx from "clsx";
 
 interface KratongProps {
   selected: Selected;
+  /** CSS length: rendered width of the whole kratong box (height is 1.171875x). Becomes `--size`. */
   height: string;
   zIndex: number;
   className?: string;
 }
 
-/*
-height: 240px
-offset: 60px
-*/
-
+/**
+ * One kratong from parts, in a box `--size` wide and `--size * 2400/2048` tall (342 x 400 design units):
+ *   decorations (full-box canvases) < flower < candle + incense < base (bottom-centred, own SVG size).
+ * Composition from Figma 187:966 / 187:551: the flower sits on the base, its bottom edge 0.485 x base
+ * height above the base bottom; the candle bottom 0.5 x base height above it. Unknown / legacy ids are
+ * mapped to defaults (see `normalizeSelected`).
+ */
 export function Kratong({ selected, height, zIndex, className }: KratongProps) {
+  const s = normalizeSelected(selected);
+  const base = KratongMap.base[s.base];
+  const flower = s.flowers === "none" ? null : KratongMap.flowers[s.flowers];
   return (
-    <>
-      <div
-        style={{ ["--size" as string]: height, ["--z-index" as string]: zIndex }}
-        className={clsx(kratongCls.root, className)}
-      >
-        <div className={kratongCls.topping}>
-          <div className={kratongCls.decorations}>
-            {Object.keys(KratongMap.decorations).map((decoration: string) => {
-              // @ts-expect-error map is indexed by string key
-              const part = KratongMap.decorations[decoration];
-              if (part.type === "normal")
-                return <NormalPart key={decoration} part={part} selected={selected.decorations} />;
-              else if (part.type === "variant")
-                return (
-                  <VariantPart
-                    key={decoration}
-                    part={part}
-                    selected={selected.decorations}
-                    signVariant={selected.signVariant}
-                  />
-                );
-            })}
-          </div>
-          <div className={kratongCls.candle}>
-            {Object.keys(KratongMap.candles).map((candle: string) => {
-              // @ts-expect-error map is indexed by string key
-              const part = KratongMap.candles[candle];
-              return <Candle key={candle} part={part} selected={selected.candles} />;
-            })}
-          </div>
-        </div>
-        <div className={kratongCls.base}>
-          <div className={kratongCls.flowers}>
-            {Object.keys(KratongMap.flowers).map((flower: string) => {
-              // @ts-expect-error map is indexed by string key
-              const part = KratongMap.flowers[flower];
-              if (part.type === "normal") return <NormalPart key={flower} part={part} selected={selected.flowers} />;
-              else if (part.type === "variant")
-                return (
-                  <VariantPart
-                    key={flower}
-                    part={part}
-                    selected={selected.flowers}
-                    signVariant={selected.signVariant}
-                  />
-                );
-            })}
-          </div>
-          <div className={kratongCls.shell}>
-            {Object.keys(KratongMap.base).map((base: string) => {
-              // @ts-expect-error map is indexed by string key
-              const part = KratongMap.base[base];
-              if (part.type === "normal") {
-                return <NormalPart key={base} part={part} selected={selected.base} />;
-              } else if (part.type === "variant")
-                return (
-                  <VariantPart key={base} part={part} selected={selected.base} signVariant={selected.signVariant} />
-                );
-            })}
-          </div>
-        </div>
+    <div
+      style={{ ["--size" as string]: height, ["--z-index" as string]: zIndex }}
+      className={clsx(kratongCls.root, className)}
+    >
+      <div className={kratongCls.decorations}>
+        {Object.values(KratongMap.decorations).map((part) =>
+          part.type === "variant" && "variants" in part ? (
+            <VariantPart key={part.id} part={part} selected={s.decorations} signVariant={s.signVariant} />
+          ) : (
+            <NormalPart key={part.id} part={part as never} selected={s.decorations} />
+          ),
+        )}
       </div>
-    </>
+      <div className={kratongCls.flower}>
+        {flower && <FlowerPart part={flower} base={base} />}
+      </div>
+      <div className={kratongCls.candle}>
+        {Object.values(KratongMap.candles).map((part) => (
+          <CandlePart key={part.id} part={part} selected={s.candles} base={base} />
+        ))}
+      </div>
+      <div className={kratongCls.base}>
+        <BasePart part={base} />
+      </div>
+    </div>
   );
 }

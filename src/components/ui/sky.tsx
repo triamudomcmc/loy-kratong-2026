@@ -1,4 +1,4 @@
-/** Teal sky gradient (Figma frames ปก / Scene 1-4: 183.82deg, Scene 17: 181.26deg). */
+/** Blue sky gradient of every new frame (ปก 187:430, Scene 19 bg 187:566, Scene 22 ...): 183.82deg, #4ed1d8 -> #1286b1 at 52.758%. */
 export function TealSky({ desktop = false }: { desktop?: boolean }) {
   return (
     <div
@@ -11,3 +11,6 @@ export function TealSky({ desktop = false }: { desktop?: boolean }) {
     />
   );
 }
+
+/** Alias: the sky is blue now; `TealSky` is kept so every existing import keeps working. */
+export const BlueSky = TealSky;

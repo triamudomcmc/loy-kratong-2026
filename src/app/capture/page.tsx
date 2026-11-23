@@ -3,10 +3,10 @@ import type { AnyResultData, KratongData } from "@types-app/kratong";
 
 const sample: KratongData = {
   kratong: {
-    base: "banana-leaf",
+    base: "green-lotus-large",
     candles: "candle-yellow",
     decorations: "swan",
-    flowers: "luck",
+    flowers: "lotus-marigold",
     signVariant: 0,
   },
   wish: {

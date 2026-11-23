@@ -12,10 +12,10 @@
   --font-title: var(--font-maitree), "Maitree", serif;
   --font-noto: var(--font-noto-sans-thai), "Noto Sans Thai", sans-serif;
 
-  /* teal sky palette (Figma ปก / Scene 1-4 / Scene 17) */
-  --color-sky-top: #4dafa9;
-  --color-sky-mid: #7cbfab;
-  --color-sky-bottom: #1d9fa6;
+  /* blue sky palette (Figma ปก 187:430, Scene 19 bg 187:566): rgb(78,209,216) -> rgb(18,134,177) at 52.758%; mid = the linear blend at 25.649% */
+  --color-sky-top: #4ed1d8;
+  --color-sky-mid: #32aec6;
+  --color-sky-bottom: #1286b1;
   --color-pill: #f6f6f6;
   --color-ink: #4a4a4a;
   --color-primary: #2256a3;
@@ -113,12 +113,12 @@
    */
   html,
   body {
-    background-color: #1d9fa6; /* teal sky bottom: story, river, capture, loading */
+    background-color: #1286b1; /* blue sky bottom: story, river, capture, loading */
     overscroll-behavior: none;
   }
   html:has([data-scene="builder"]),
   html:has([data-scene="builder"]) body {
-    background-color: #7b5fb0; /* the builder's pink/blue glass backdrop */
+    background-color: #1286b1; /* the builder's blue glass backdrop (same sky) */
   }
   html:has([data-scene="plain"]),
   html:has([data-scene="plain"]) body {

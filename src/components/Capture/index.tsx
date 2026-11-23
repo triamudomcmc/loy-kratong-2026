@@ -1,12 +1,10 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import type { CSSProperties, FC, ReactNode } from "react";
+import type { CSSProperties, FC } from "react";
 import { Layer, Moon, NavHeader, TealSky, u } from "@components/ui";
-import type { AnyResultData, CupsaaKratongData, KratongData, PrincipalKratongData } from "@types-app/kratong";
+import type { AnyResultData, KratongData } from "@types-app/kratong";
 import { StandardKratong as Kratong } from "./capturekratong";
-import { PrincipalKratong } from "@components/Principal/kratong";
-import { CUPSAAKratong } from "@components/CUPSAA/kratong";
 
 const A = "/assets/figma/capture";
 
@@ -25,14 +23,9 @@ interface Place {
   filter?: string;
 }
 
-/** The user's kratong: picks the renderer from the shape of the saved data. */
+/** The user's kratong. */
 const UserKratong: FC<{ data: AnyResultData; place: Place }> = ({ data, place }) => {
-  const k = data.kratong as unknown as Record<string, string | number>;
-  const size = u(place.size);
-  let node: ReactNode;
-  if ("swan" in k) node = <PrincipalKratong selected={data.kratong as PrincipalKratongData["kratong"]} height={size} zIndex={place.z} />;
-  else if (!("decorations" in k)) node = <CUPSAAKratong selected={data.kratong as CupsaaKratongData["kratong"]} height={size} zIndex={place.z} />;
-  else node = <Kratong data={data as KratongData} size={size} />;
+  const node = <Kratong data={data as KratongData} size={u(place.size)} />;
   return (
     <div className="absolute" style={{ left: u(place.x), top: u(place.y), zIndex: place.z, filter: place.filter }}>
       {node}
