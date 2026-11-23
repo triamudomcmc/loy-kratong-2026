@@ -45,7 +45,7 @@ export function NavLoy() {
           whileHover={{ scale: 1.04 }}
           whileTap={{ scale: 0.96 }}
           transition={{ type: "spring", stiffness: 400, damping: 22 }}
-          className="pointer-events-auto absolute flex items-center text-white bg-[#051018] transition-[filter] hover:brightness-125 active:brightness-150 disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+          className="pointer-events-auto absolute flex items-center text-white bg-white/0 transition-colors hover:bg-white/20 active:bg-white/30 disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
           style={{
             right: u(28.682),
             top: u(33),
@@ -57,7 +57,7 @@ export function NavLoy() {
           }}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img alt="" className="absolute block max-w-none" style={{ left: u(17.5), top: u(7.5), width: u(24), height: u(24) }} src="/assets/figma/river/icon-download.svg" />
+          <img alt="" className="absolute block max-w-none" style={{ left: u(14), top: u(5.5), width: u(30), height: u(30) }} src="/assets/figma-v2/river/icon-camera.svg" />
           <span
             className="absolute font-noto font-normal whitespace-nowrap"
             style={{ left: u(44.5), top: u(8.5), fontSize: u(16.597), lineHeight: u(22) }}

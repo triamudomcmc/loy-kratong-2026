@@ -6,7 +6,15 @@ import { motion } from "motion/react";
 import { Frame, Layer, u } from "@components/ui";
 import type { ResultData } from "@types-app/kratong";
 
-export const captureUrl = (entity: ResultData) => `/api/capture?data=${encodeURIComponent(JSON.stringify(entity))}`;
+export type CaptureStyle = "day" | "night";
+
+export const captureUrl = (entity: ResultData, style: CaptureStyle = "day") =>
+  `/api/capture?data=${encodeURIComponent(JSON.stringify(entity))}&style=${style}`;
+
+const STYLES: { id: CaptureStyle; label: string }[] = [
+  { id: "day", label: "กลางวัน" },
+  { id: "night", label: "กลางคืน" },
+];
 
 /** Downloads the share image; in-app browsers (LINE, Messenger, Facebook) cannot save blob URLs, so they get the plain link. */
 export async function downloadCapture(imgUrl: string): Promise<boolean> {
@@ -30,16 +38,25 @@ export async function downloadCapture(imgUrl: string): Promise<boolean> {
 
 /** Snap modal (Figma Snap 91:1096): glass card with the real share image and a "บันทึก" download button. */
 export const SnapModal: FC<{ entity: ResultData; onClose: () => void }> = ({ entity, onClose }) => {
-  const imgUrl = captureUrl(entity);
+  const [style, setStyle] = useState<CaptureStyle>("day");
+  const imgUrl = captureUrl(entity, style);
   const [state, setState] = useState<"loading" | "ready" | "error">("loading");
   const [saving, setSaving] = useState(false);
   const [failed, setFailed] = useState(false);
+  const [retry, setRetry] = useState(0);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose]);
+
+  const pick = (id: CaptureStyle) => {
+    if (id === style) return;
+    setState("loading");
+    setFailed(false);
+    setStyle(id);
+  };
 
   const save = useCallback(async () => {
     if (saving || state !== "ready") return;
@@ -73,8 +90,8 @@ export const SnapModal: FC<{ entity: ResultData; onClose: () => void }> = ({ ent
         aria-hidden
         className="absolute inset-0 pointer-events-none"
         style={{
-          backgroundImage:
-            "linear-gradient(264.4121deg, rgba(255,112,112,0.89) 0%, rgba(255,112,112,0.78) 0%, rgba(59,79,255,0.63) 110.41%)",
+          // Snap bg 187:820: the blue sky (blur is on the parent)
+          backgroundImage: "linear-gradient(183.82deg, var(--color-sky-top) 1.5%, var(--color-sky-bottom) 52.76%)",
         }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -115,7 +132,7 @@ export const SnapModal: FC<{ entity: ResultData; onClose: () => void }> = ({ ent
               WebkitBackdropFilter: `blur(${u(30)})`,
             }}
           >
-            <Layer x={0} y={30} w={343} h={30} className="flex items-center justify-center">
+            <Layer x={0} y={20} w={343} h={30} className="flex items-center justify-center">
               <h2 className="font-ui font-normal text-white whitespace-nowrap" style={{ fontSize: u(20), lineHeight: "normal" }}>
                 บันทึกภาพกระทง
               </h2>
@@ -134,22 +151,63 @@ export const SnapModal: FC<{ entity: ResultData; onClose: () => void }> = ({ ent
               <img alt="" className="absolute block inset-0 size-full max-w-none" src="/assets/figma/river/snap-x.svg" />
             </motion.button>
 
+            <div
+              role="radiogroup"
+              aria-label="สไตล์ภาพ"
+              className="absolute flex"
+              style={{
+                left: u(61.5),
+                top: u(56),
+                width: u(220),
+                height: u(30),
+                borderRadius: u(15),
+                border: `${u(1)} solid #fff`,
+                padding: u(2),
+              }}
+            >
+              {STYLES.map((o) => {
+                const on = o.id === style;
+                return (
+                  <button
+                    key={o.id}
+                    type="button"
+                    role="radio"
+                    aria-checked={on}
+                    onClick={() => pick(o.id)}
+                    className="relative flex-1 font-noto font-normal focus-visible:outline-2 focus-visible:outline-white"
+                    style={{ fontSize: u(14), lineHeight: "normal", borderRadius: u(13), color: on ? "#2256a3" : "#fff" }}
+                  >
+                    {on && (
+                      <motion.span
+                        layoutId="snap-style"
+                        className="absolute inset-0 bg-white"
+                        style={{ borderRadius: u(13), boxShadow: `0 ${u(1)} ${u(3)} rgba(0,0,0,0.2)` }}
+                        transition={{ type: "spring", stiffness: 500, damping: 36 }}
+                      />
+                    )}
+                    <span className="relative">{o.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+
             <Layer
-              x={33}
-              y={81}
-              w={276.188}
-              h={516}
+              x={42.8}
+              y={96}
+              w={257.4}
+              h={485}
               className="overflow-clip"
               style={{
-                borderRadius: u(16.355),
-                border: `${u(0.477)} solid #fff`,
-                backgroundImage: "linear-gradient(180deg, #c23c1e 0%, #000 35%, #236bad 70.866%)",
+                borderRadius: u(16),
+                border: `${u(0.5)} solid #fff`,
+                backgroundImage: "linear-gradient(183.82deg, var(--color-sky-top) 1.5%, var(--color-sky-bottom) 52.76%)",
               }}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
+                key={`${imgUrl}#${retry}`}
                 alt="ภาพกระทง"
-                src={imgUrl}
+                src={retry ? `${imgUrl}&r=${retry}` : imgUrl}
                 className="absolute inset-0 size-full max-w-none object-cover transition-opacity duration-500"
                 style={{ opacity: state === "ready" ? 1 : 0 }}
                 onLoad={() => setState("ready")}
@@ -166,12 +224,23 @@ export const SnapModal: FC<{ entity: ResultData; onClose: () => void }> = ({ ent
                       <span>กำลังสร้างภาพ...</span>
                     </>
                   ) : (
-                    <span>สร้างภาพไม่สำเร็จ</span>
+                    <>
+                      <span>สร้างภาพไม่สำเร็จ</span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setState("loading");
+                          setRetry((n) => n + 1);
+                        }}
+                        className="rounded-full border border-white px-4 py-1 hover:bg-white/20"
+                      >
+                        ลองอีกครั้ง
+                      </button>
+                    </>
                   )}
                 </div>
               )}
             </Layer>
-
             <motion.button
               type="button"
               onClick={save}

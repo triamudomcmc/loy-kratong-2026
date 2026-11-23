@@ -171,9 +171,66 @@ const Clouds = () => (
   </>
 );
 
+const R = "/assets/figma-v2/river";
 const FIREWORKS = {
-  big: "/assets/figma/river/firework-white-big.gif",
-  single: "/assets/figma/river/firework-white-single.gif",
+  bigWhite: `${R}/fw-white-big.gif`,
+  bigYellow: `${R}/fw-yellow-big.gif`,
+  singleWhite: `${R}/fw-white-single.gif`,
+  singleYellow: `${R}/fw-yellow-single.gif`,
+};
+
+/** Static firework bursts (Figma Group 6310 yellow / Group 6311 white, 187:966): four SVG parts, offsets relative to the group box. */
+const BURSTS = {
+  yellow: {
+    w: 177.886,
+    h: 179.54,
+    parts: [
+      { f: "fw-yellow-1", x: 56.46, y: 55.24, w: 30.194, h: 33.83 },
+      { f: "fw-yellow-2", x: 0, y: 0, w: 177.886, h: 179.54, iw: 150.817, ih: 148.637, rotate: 77.44 },
+      { f: "fw-yellow-3", x: 94.28, y: 81.37, w: 38.587, h: 34.163, iw: 28.239, ih: 33.829, rotate: -100.98, flipY: true },
+      { f: "fw-yellow-4", x: 45.94, y: 87.47, w: 51.979, h: 45.306, flipY: true },
+    ],
+  },
+  white: {
+    w: 156.284,
+    h: 157.737,
+    parts: [
+      { f: "fw-white-1", x: 49.6, y: 48.53, w: 26.528, h: 29.722 },
+      { f: "fw-white-2", x: 0, y: 0, w: 156.284, h: 157.737, iw: 132.502, ih: 130.587, rotate: 77.44 },
+      { f: "fw-white-3", x: 82.83, y: 71.49, w: 33.901, h: 30.014, iw: 24.809, ih: 29.721, rotate: -100.98, flipY: true },
+      { f: "fw-white-4", x: 40.36, y: 76.85, w: 45.667, h: 39.805, flipY: true },
+    ],
+  },
+} as const;
+
+const Burst: FC<{ color: keyof typeof BURSTS; x: number; y: number; scale?: number }> = ({ color, x, y, scale = 1 }) => {
+  const b = BURSTS[color];
+  return (
+    <Layer x={x} y={y} w={b.w * scale} h={b.h * scale} className="pointer-events-none">
+      {b.parts.map((p) => {
+        const part = p as { f: string; x: number; y: number; w: number; h: number; iw?: number; ih?: number; rotate?: number; flipY?: boolean };
+        return (
+          <div
+            key={part.f}
+            className="absolute flex items-center justify-center"
+            style={{ left: u(part.x * scale), top: u(part.y * scale), width: u(part.w * scale), height: u(part.h * scale) }}
+          >
+            <div
+              className="relative flex-none"
+              style={{
+                width: u((part.iw ?? part.w) * scale),
+                height: u((part.ih ?? part.h) * scale),
+                scale: part.flipY ? "1 -1" : undefined,
+                rotate: part.rotate ? `${part.rotate}deg` : undefined,
+              }}
+            >
+              <Img src={`${R}/${part.f}.svg`} className="inset-0 size-full" />
+            </div>
+          </div>
+        );
+      })}
+    </Layer>
+  );
 };
 
 /* ------------------------------------------------------------------ scene */
@@ -399,47 +456,54 @@ export const RiverScene: FC<{ entities: ResultData[] }> = ({ entities }) => {
     <div
       ref={scroller}
       className="h-dvh w-full overflow-x-auto overflow-y-hidden [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-      style={{ ["--u" as string]: RIVER_U, background: "#1d9fa6" }}
+      style={{ ["--u" as string]: RIVER_U, background: "var(--color-sky-bottom)" }}
     >
       <div
         className="relative overflow-hidden"
         style={{
           width: u(RIVER_W),
           height: u(RIVER_H),
-          backgroundImage: "linear-gradient(180.77809587648227deg, #4dafa9 1.4976%, #7cbfab 25.649%, #1d9fa6 52.758%)",
+          backgroundImage:
+            "linear-gradient(183.82deg, var(--color-sky-top) 1.5%, var(--color-sky-mid) 25.649%, var(--color-sky-bottom) 52.76%)",
         }}
         onClick={(e) => e.target === e.currentTarget && close()}
       >
         {/* city skyline (ตึกดำสนิท 1) */}
         <Layer x={-7} y={252} w={2370} h={299.722} className="overflow-hidden pointer-events-none" style={{ opacity: 0.44 }}>
-          <Img src="/assets/figma/river/buildings.png" style={{ left: 0, width: "100%", height: "330.89%", top: "-168.53%" }} />
+          <Img src="/assets/figma-v2/river/buildings.png" style={{ left: 0, width: "100%", height: "330.89%", top: "-168.53%" }} />
         </Layer>
-        <Water band={4} src="/assets/figma/river/water-4.svg" box={[-63, 504, 2931, 512]} />
+        <Water band={4} src={`${R}/water-4.svg`} box={[-63, 504, 2931, 512]} />
 
         {/* back lane */}
         <div className="absolute inset-0 z-0 pointer-events-none [&>*]:pointer-events-auto">{renderLane("back")}</div>
-        <Water band={3} src="/assets/figma/river/water-3.svg" box={[-64, 597, 2934, 512]} bleed={[-6.84, -1.02, -4.88, -1.02]} />
+        <Water band={3} src={`${R}/water-3.svg`} box={[-64, 597, 2934, 512]} bleed={[-6.84, -1.02, -4.88, -1.02]} />
         {renderLabels("back")}
 
-        {/* fireworks */}
+        {/* fireworks (animated gifs + the static bursts of the share frames) */}
         <Layer x={-4} y={84} w={430} h={322.5} className="pointer-events-none">
-          <Img src={FIREWORKS.big} className="inset-0 size-full object-cover" />
+          <Img src={FIREWORKS.bigYellow} className="inset-0 size-full object-cover" />
         </Layer>
         <Layer x={1767} y={-17} w={516} h={387} className="pointer-events-none">
-          <Img src={FIREWORKS.big} className="inset-0 size-full object-cover" />
+          <Img src={FIREWORKS.bigWhite} className="inset-0 size-full object-cover" />
         </Layer>
         <Layer x={825} y={-11} w={577} h={432} className="pointer-events-none" style={{ transform: "scaleX(-1)" }}>
-          <Img src={FIREWORKS.big} className="inset-0 size-full object-cover" />
+          <Img src={FIREWORKS.bigYellow} className="inset-0 size-full object-cover" />
         </Layer>
+        <Burst color="yellow" x={612} y={120} scale={1.15} />
+        <Burst color="white" x={1190} y={190} />
+        <Burst color="yellow" x={1640} y={80} scale={0.9} />
+        <Burst color="white" x={2040} y={170} scale={1.1} />
 
-        {/* sala */}
-        <Layer x={-49} y={165} w={590.899} h={604.905} className="pointer-events-none">
-          <Img src="/assets/figma/river/sala.png" className="inset-0 size-full object-cover" />
+        {/* sala: Figma Group 6302 (3378x1235) at 0.43 so its right deck and plank form the pier */}
+        <Layer x={0} y={0} w={340} h={RIVER_H} className="overflow-hidden pointer-events-none">
+          <Layer x={-715} y={197} w={1452.54} h={531.05}>
+            <Img src="/assets/figma-v2/scenery/sala.svg" className="inset-0 size-full" />
+          </Layer>
         </Layer>
 
         {/* mid lane */}
         <div className="absolute inset-0 z-0 pointer-events-none [&>*]:pointer-events-auto">{renderLane("mid")}</div>
-        <Water band={2} src="/assets/figma/river/water-2.svg" box={[-142, 716, 2962, 541.061]} bleed={[-6.47, -1.01, -4.62, -1.01]} />
+        <Water band={2} src={`${R}/water-2.svg`} box={[-142, 716, 2962, 541.061]} bleed={[-6.47, -1.01, -4.62, -1.01]} />
 
         {renderLabels("mid")}
 
@@ -497,7 +561,7 @@ export const RiverScene: FC<{ entities: ResultData[] }> = ({ entities }) => {
 
         {/* front lane */}
         <div className="absolute inset-0 z-0 pointer-events-none [&>*]:pointer-events-auto">{renderLane("front")}</div>
-        <Water band={1} src="/assets/figma/river/water-1.svg" box={[-150, 859, 3253, 541.061]} bleed={[-6.47, -0.92, -4.62, -0.92]} />
+        <Water band={1} src={`${R}/water-1.svg`} box={[-150, 859, 3253, 541.061]} bleed={[-6.47, -0.92, -4.62, -0.92]} />
 
         {renderLabels("front")}
 
@@ -519,14 +583,14 @@ export const RiverScene: FC<{ entities: ResultData[] }> = ({ entities }) => {
 
         <Clouds />
         <div className="absolute inset-0 pointer-events-none [&_*]:pointer-events-none">
-          <Moon glow={{ x: 267, y: 67, size: 99 }} body={{ x: 267, y: 64, size: 101 }} />
+          <Moon glow={{ x: 266, y: 63, size: 103 }} body={{ x: 265, y: 62, size: 105 }} />
         </div>
 
         <Layer x={454} y={40} w={342} h={372.642} className="pointer-events-none">
-          <Img src={FIREWORKS.single} className="inset-0 size-full object-cover" />
+          <Img src={FIREWORKS.singleYellow} className="inset-0 size-full object-cover" />
         </Layer>
         <Layer x={1460} y={96} w={293} h={319.251} className="pointer-events-none" style={{ transform: "scaleX(-1)" }}>
-          <Img src={FIREWORKS.single} className="inset-0 size-full object-cover" />
+          <Img src={FIREWORKS.singleWhite} className="inset-0 size-full object-cover" />
         </Layer>
 
         {/* wish popup */}
