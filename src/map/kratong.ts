@@ -130,7 +130,7 @@ export const FLOWER_TUNE: Partial<Record<BaseId, Partial<Record<FlowerId, { dy?:
     "purple-cream": { dy: -12 }, // #14
   },
   "pink-lotus": {
-    "pink-lotus": { dy: -20, scale: 0.9 }, // #17
+    "pink-lotus": { dy: -28, scale: 0.9 }, // #17
     "pink-blossom": { dy: -20 }, // #18
     frangipani: { dy: -10 }, // #20
   },
