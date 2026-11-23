@@ -12,4 +12,6 @@ export const kratongCls = {
   flower: "absolute inset-0 z-[calc(var(--z-index)-2)]",
   candle: "absolute inset-0 z-[calc(var(--z-index)-1)]",
   base: "absolute inset-0 z-[var(--z-index)]",
+  /** open bases (ice bowl) sit behind everything else so the contents stand on top of them */
+  baseUnder: "absolute inset-0 z-[calc(var(--z-index)-4)]",
 } as const;

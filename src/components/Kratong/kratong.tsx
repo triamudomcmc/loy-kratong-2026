@@ -1,4 +1,4 @@
-import { KratongMap, normalizeSelected } from "@map/kratong";
+import { KratongMap, SHOW_DECORATIONS, normalizeSelected } from "@map/kratong";
 import { kratongCls } from "@components/kratong-classes";
 import { BasePart, CandlePart, FlowerPart, NormalPart, VariantPart } from "./parts";
 import type { Selected } from "./create";
@@ -31,7 +31,7 @@ export function Kratong({ selected, height, zIndex, className, lit = true }: Kra
       className={clsx(kratongCls.root, className)}
     >
       <div className={kratongCls.decorations}>
-        {Object.values(KratongMap.decorations).map((part) =>
+        {SHOW_DECORATIONS && Object.values(KratongMap.decorations).map((part) =>
           part.type === "variant" && "variants" in part ? (
             <VariantPart key={part.id} part={part} selected={s.decorations} signVariant={s.signVariant} />
           ) : (
@@ -47,7 +47,7 @@ export function Kratong({ selected, height, zIndex, className, lit = true }: Kra
           <CandlePart key={part.id} part={part} selected={s.candles} base={base} lit={lit} />
         ))}
       </div>
-      <div className={kratongCls.base}>
+      <div className={base.open ? kratongCls.baseUnder : kratongCls.base}>
         <BasePart part={base} />
       </div>
     </div>

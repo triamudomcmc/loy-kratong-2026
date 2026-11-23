@@ -3,7 +3,7 @@
 import type { FC } from "react";
 import { useState } from "react";
 import { Kratong } from "./kratong";
-import { DEFAULT_BASE, DEFAULT_FLOWER, KratongMap, normalizeSelected, KratongType, KratongTypeVariant } from "@map/kratong";
+import { DEFAULT_BASE, DEFAULT_FLOWER, KratongMap, SHOW_DECORATIONS, normalizeSelected, KratongType, KratongTypeVariant } from "@map/kratong";
 import { pushKratong } from "@server/actions";
 import { useRouter } from "next/navigation";
 import { u } from "@components/ui";
@@ -34,7 +34,7 @@ const TABS: { id: Part; label: string }[] = [
   { id: "base", label: "ฐาน" },
   { id: "flowers", label: "ดอกไม้" },
   { id: "candles", label: "เทียน" },
-  { id: "decorations", label: "ของตกแต่ง" },
+  ...(SHOW_DECORATIONS ? [{ id: "decorations" as const, label: "ของตกแต่ง" }] : []),
 ];
 
 type AnyPart = KratongType | KratongTypeVariant;

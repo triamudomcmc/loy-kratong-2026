@@ -35,6 +35,11 @@ export type KratongBaseType = KratongType & {
   height: number;
   /** Bottom edge of the candle as a fraction of the base height above the base bottom (default .5, from Figma 187:966). */
   candleLift?: number;
+  /**
+   * Open container (the ice bowl): drawn *behind* the flower and candle, which stand on its top surface instead of
+   * being tucked behind front petals. `surface` = units above the base bottom where they sit.
+   */
+  open?: { surface: number };
 };
 
 /** New SVG flower: `width`/`height` natural size, `fit` = rendered width in the 341-unit kratong box. */
@@ -75,6 +80,12 @@ export interface KratongMapType {
 
 export type BaseId = "green-lotus-large" | "green-lotus" | "blue-bowl" | "pink-lotus" | "orange-lotus";
 export type FlowerId = "lotus-marigold" | "pink-lotus" | "pink-blossom" | "purple-cream" | "frangipani";
+
+/**
+ * Decorations (signs, swan, naga, cactus) are switched off: no ของตกแต่ง tab in the builder and never drawn on a
+ * kratong, including older saved ones. Flip to true to bring them back; the parts and data are kept.
+ */
+export const SHOW_DECORATIONS = false;
 
 export const DEFAULT_BASE: BaseId = "green-lotus-large";
 export const DEFAULT_FLOWER: FlowerId = "lotus-marigold";
@@ -127,7 +138,8 @@ export const KratongMap: KratongMapType = {
       thumbnail: "/assets/kratong-v2/bases/blue-bowl.svg",
       width: 312,
       height: 128,
-      candleLift: 0.68,
+      // rim ellipse centre is 31.2 units below the top (SVG ellipse cy=31.2): contents stand just behind it
+      open: { surface: 92 },
     },
     "pink-lotus": {
       id: "pink-lotus",

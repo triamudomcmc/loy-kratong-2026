@@ -49,7 +49,7 @@ const CANDLE_BBOX_BOTTOM = (CANDLE_H * (2400 - 1394)) / 2400; // transparent str
 const NO_FLAME = "polygon(evenodd, 0 0, 100% 0, 100% 100%, 0 100%, 0 0, 44.9% 12.5%, 55.7% 12.5%, 55.7% 27.4%, 44.9% 27.4%, 44.9% 12.5%)";
 
 export function CandlePart({ part, selected, base, lit = true }: KratongNormalPartProps & { base: KratongBaseType; lit?: boolean }) {
-  const lift = base.height * (base.candleLift ?? 0.5);
+  const lift = base.open ? base.open.surface : base.height * (base.candleLift ?? 0.5);
   return (
     <img
       draggable={false}
@@ -73,7 +73,8 @@ const FLOWER_RISE = 59;
 /** Flower on the base: bottom-centred, its top FLOWER_RISE units above the base top so it always reads clearly in front of the base's tips. */
 export function FlowerPart({ part, base }: { part: KratongFlowerType; base: KratongBaseType }) {
   const h = (part.fit * part.height) / part.width;
-  const bottom = Math.max(0, base.height + FLOWER_RISE - h);
+  // open bowl: the flower stands on the bowl's surface; otherwise its top rises FLOWER_RISE above the base top
+  const bottom = base.open ? base.open.surface - 6 : Math.max(0, base.height + FLOWER_RISE - h);
   return (
     <img
       draggable={false}
