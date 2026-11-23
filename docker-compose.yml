@@ -1,0 +1,18 @@
+name: loy-kratong-postgres
+
+services:
+  db:
+    image: postgres:17
+    container_name: loy-kratong-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: loy
+      POSTGRES_PASSWORD: loy
+      POSTGRES_DB: loykratong
+    ports:
+      - "5433:5432"
+    volumes:
+      - loy-kratong-pgdata:/var/lib/postgresql/data
+
+volumes:
+  loy-kratong-pgdata:

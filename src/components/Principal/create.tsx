@@ -323,7 +323,7 @@ const Result = ({ id, data, prevPage }: ResultProps) => {
     const send = async () => {
       for (let attempt = 0; attempt < 3; attempt++) {
         try {
-          const res = await sendData({ id, data });
+          const res = await sendData({ id, data, kind: "PRINCIPAL" });
           if (res?.status) return;
         } catch {
           // fall through to retry

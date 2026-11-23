@@ -1,5 +1,5 @@
 import "server-only";
-import { getDb } from "./firebase";
+import { prisma } from "./db";
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const wordcut = require("wordcut");
 
@@ -8,17 +8,16 @@ export interface Blocklist {
   dict: string[];
 }
 
-/** Fetch the blocklist and base dictionary once per request. */
+const CACHE_TTL_MS = 60_000;
+let cache: { at: number; list: Blocklist } | null = null;
+
+/** Fetch the blocklist and base dictionary, cached in memory for about a minute. */
 export async function loadBlocklist(): Promise<Blocklist> {
-  const db = getDb();
-  const [main, dict] = await Promise.all([
-    db.collection("database").doc("main").get(),
-    db.collection("database").doc("dict").get(),
-  ]);
-  return {
-    blocked: String(main.get("data") ?? "").split(" "),
-    dict: String(dict.get("5000") ?? "").split(" "),
-  };
+  if (cache && Date.now() - cache.at < CACHE_TTL_MS) return cache.list;
+  const [blocked, dict] = await Promise.all([prisma.blockedWord.findMany(), prisma.dictionaryWord.findMany()]);
+  const list: Blocklist = { blocked: blocked.map((w) => w.word), dict: dict.map((w) => w.word) };
+  cache = { at: Date.now(), list };
+  return list;
 }
 
 export function isCursed(text: string, list: Blocklist): boolean {

@@ -35,12 +35,28 @@
 - Buttons get `cursor: pointer` back via a base rule in `globals.css`.
 
 ## Environment
-See `.env.example`: `FCERT_PROJECT_ID`, `FCERT_PRIVATE_KEY`, `FCERT_CLIENT_EMAIL`, `PASSWORD`, optional `CHROME_PATH` (local dev Chrome for `/api/capture`).
+See `.env.example`: `DATABASE_URL`, `PASSWORD`, optional `CHROME_PATH` (local dev Chrome for `/api/capture`).
 
 ## Deploy notes
-- firebase-admin 14 declares Node ≥ 24.12 (installed locally with `--ignore-engines` on Node 22). Use Node 24 on Vercel.
 - `/api/capture` runs on the Node runtime with `maxDuration = 60`; @sparticuz/chromium is Linux-only (works on Vercel, not in `next start` on macOS — use `next dev`, which uses local Chrome).
 - TypeScript is pinned to 6.0 until typescript-eslint supports 7.
 
 ## Not yet verified at runtime
-Pages that read Firestore (`/create?id=`, `/loykratong`, `/principal`, `/CUPSAA`, `/filter`) and the profanity check need real Firebase credentials to test end-to-end.
+Pages that read the database (`/create?id=`, `/loykratong`, `/principal`, `/CUPSAA`, `/filter`) and the profanity check need a seeded Postgres to test end-to-end.
+
+## Firebase to Postgres (Prisma)
+Firestore was replaced by self-hosted Postgres through Prisma 7 (`prisma-client` generator, `@prisma/adapter-pg`). Nothing was migrated; the data starts fresh and `firebase-admin` is gone.
+
+| Firestore | Postgres |
+|---|---|
+| `rawEntities` / `filteredEntities` / `archivedEntities` | `Kratong` with `status` PENDING / DISPLAYED / ARCHIVED (moderation is a status update) |
+| `kratong-por-oar` | `SpecialKratong` (invite records, created by hand) |
+| `database/main.data` | `BlockedWord` |
+| `database/dict["5000"]` | `DictionaryWord` |
+
+- `sendData` now takes `kind` (`PRINCIPAL` | `CUPSAA`) and upserts on `sourceId` (the invite id), so retries do not duplicate.
+- The blocklist is cached in memory for about 60 seconds.
+- The generated client is written to `src/generated/prisma` (gitignored); `postinstall` runs `prisma generate`.
+- Profanity lists are seeded from gitignored `data/*.txt` (see `data/README.md`).
+- **Deploy:** run `yarn db:deploy` (`prisma migrate deploy`) against the production database before or during each deploy, then `yarn db:seed` once to load the word lists.
+- Local DB: `docker compose up -d` (host port 5433).

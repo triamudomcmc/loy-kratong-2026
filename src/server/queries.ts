@@ -1,11 +1,12 @@
 import "server-only";
 import type { AnyResultData } from "@types-app/kratong";
-import { getDb } from "./firebase";
+import { prisma } from "./db";
 
-/** Reads `kratong-por-oar/{id}`; resolves to null when missing. */
+/** Reads the invite record for `id`; resolves to null when missing. */
 export async function getPorOarKratong(id: string): Promise<AnyResultData | null> {
-  const snap = await getDb().collection("kratong-por-oar").doc(id).get();
-  return snap.exists ? (snap.data() as AnyResultData) : null;
+  const row = await prisma.specialKratong.findUnique({ where: { id } });
+  if (!row) return null;
+  return { kratong: row.kratong, wish: { name: row.wishName, content: row.wishContent } } as unknown as AnyResultData;
 }
 
 function getRandom<T>(arr: T[], n: number): T[] {
@@ -21,8 +22,14 @@ function getRandom<T>(arr: T[], n: number): T[] {
   return result;
 }
 
-/** Oldest 24 filtered entities, then a random 8 of them. */
+/** Oldest 24 displayed entities, then a random 8 of them. */
 export async function getSceneEntities(): Promise<AnyResultData[]> {
-  const snap = await getDb().collection("filteredEntities").orderBy("timestamp", "asc").limit(24).get();
-  return getRandom(snap.docs, 8).map((item) => item.data() as AnyResultData);
+  const rows = await prisma.kratong.findMany({
+    where: { status: "DISPLAYED" },
+    orderBy: { createdAt: "asc" },
+    take: 24,
+  });
+  return getRandom(rows, 8).map(
+    (row) => ({ kratong: row.kratong, wish: { name: row.wishName, content: row.wishContent } }) as unknown as AnyResultData,
+  );
 }

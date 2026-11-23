@@ -1,0 +1,50 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum KratongKind {
+  STANDARD
+  PRINCIPAL
+  CUPSAA
+}
+
+enum KratongStatus {
+  PENDING
+  DISPLAYED
+  ARCHIVED
+}
+
+model Kratong {
+  id          String        @id @default(cuid())
+  kind        KratongKind
+  kratong     Json // KratongSelected | PrincipalSelected | CupsaaSelected
+  wishName    String
+  wishContent String
+  status      KratongStatus @default(PENDING)
+  sourceId    String?       @unique // invite id for PRINCIPAL/CUPSAA; dedupes sendData retries
+  createdAt   DateTime      @default(now())
+
+  @@index([status, createdAt])
+}
+
+model SpecialKratong {
+  id          String      @id // the ?id= in invite links
+  kind        KratongKind
+  kratong     Json
+  wishName    String
+  wishContent String
+  createdAt   DateTime    @default(now())
+}
+
+model BlockedWord {
+  word String @id
+}
+
+model DictionaryWord {
+  word String @id
+}
