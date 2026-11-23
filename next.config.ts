@@ -7,6 +7,10 @@ const nextConfig: NextConfig = {
   // These packages must stay external: wordcut loads its dictionaries through __dirname,
   // and chromium ships a binary that cannot be bundled.
   serverExternalPackages: ["wordcut", "puppeteer-core", "@sparticuz/chromium"],
+  // The old moderation page moved to /admin; keep old bookmarks working.
+  async redirects() {
+    return [{ source: "/filter", destination: "/admin", permanent: false }];
+  },
   outputFileTracingIncludes: {
     "/api/capture": ["./node_modules/@sparticuz/chromium/bin/**/*"],
     // Server Actions (pushKratong) run under whichever page route posts them.

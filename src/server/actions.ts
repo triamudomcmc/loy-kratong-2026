@@ -1,20 +1,9 @@
 "use server";
 
 import type { AnyResultData } from "@types-app/kratong";
-import type { Prisma, Kratong } from "../generated/prisma/client";
+import type { Prisma } from "../generated/prisma/client";
 import { prisma } from "./db";
 import { isCursed, loadBlocklist } from "./profanity";
-
-export type EntityRecord = Record<string, unknown> & { id: string };
-
-function toRecord(row: Kratong): EntityRecord {
-  return {
-    id: row.id,
-    kratong: row.kratong,
-    wish: { name: row.wishName, content: row.wishContent },
-    timestamp: row.createdAt.getTime(),
-  };
-}
 
 export async function pushKratong({
   data,
@@ -48,54 +37,6 @@ export async function pushKratong({
     return { status: true, report: "success", data: { id: row.id } };
   } catch (e) {
     console.error("pushKratong failed", e);
-    return { status: false, report: "unexpected_error" };
-  }
-}
-
-export async function loadFilterList({ password }: { password: string }): Promise<
-  | { status: true; report: "success"; data: { raw: EntityRecord[]; archived: EntityRecord[]; display: EntityRecord[] } }
-  | { status: false; report: "access_denied" | "unexpected_error" }
-> {
-  if (!process.env.PASSWORD || password !== process.env.PASSWORD) {
-    return { status: false, report: "access_denied" };
-  }
-  try {
-    const read = async (status: "PENDING" | "ARCHIVED" | "DISPLAYED"): Promise<EntityRecord[]> => {
-      const rows = await prisma.kratong.findMany({ where: { status }, orderBy: { createdAt: "asc" }, take: 20 });
-      return rows.map(toRecord);
-    };
-    const [raw, archived, display] = await Promise.all([read("PENDING"), read("ARCHIVED"), read("DISPLAYED")]);
-    return { status: true, report: "success", data: { raw, archived, display } };
-  } catch (e) {
-    console.error("loadFilterList failed", e);
-    return { status: false, report: "unexpected_error" };
-  }
-}
-
-export async function updateFilterList({
-  password,
-  id,
-  type,
-}: {
-  password: string;
-  id: string;
-  type: "archive" | "display";
-}): Promise<
-  | { status: true; report: "success"; data: { type: "archive" | "display" } }
-  | { status: false; report: "access_denied" | "unexpected_error" }
-> {
-  if (!process.env.PASSWORD || password !== process.env.PASSWORD) {
-    return { status: false, report: "access_denied" };
-  }
-  try {
-    const { count } = await prisma.kratong.updateMany({
-      where: { id, status: "PENDING" },
-      data: { status: type === "display" ? "DISPLAYED" : "ARCHIVED" },
-    });
-    if (count === 0) return { status: false, report: "unexpected_error" };
-    return { status: true, report: "success", data: { type } };
-  } catch (e) {
-    console.error("updateFilterList failed", e);
     return { status: false, report: "unexpected_error" };
   }
 }

@@ -8,7 +8,7 @@ Next.js 16 (App Router) · React 19 · Tailwind CSS 4 · Motion · Postgres + Pr
 ## Development
 ```bash
 yarn install
-cp .env.example .env          # set DATABASE_URL (default matches docker-compose) and PASSWORD
+cp .env.example .env          # set DATABASE_URL (default matches docker-compose) and ADMIN_PASSWORD
 docker compose up -d          # local Postgres 17 on host port 5433
 yarn db:migrate               # apply migrations (also generates the Prisma client)
 yarn db:seed                  # load data/blocklist.txt + data/dictionary.txt (see data/README.md)
@@ -26,7 +26,7 @@ Invite records for `/create?id=`, `/principal?id=`, `/CUPSAA?id=` live in the `S
 | `/create` | Kratong builder |
 | `/loykratong` | River scene |
 | `/principal?id=`, `/CUPSAA?id=` | Special kratongs |
-| `/filter` | Moderation (password) |
+| `/admin` | Moderation dashboard (password; `/filter` redirects here) |
 | `/capture`, `/api/capture` | 1080×1920 share image |
 
 See `MIGRATION_NOTES.md` for the 2021 → 2026 upgrade details.
@@ -37,7 +37,8 @@ The repo ships a production `Dockerfile` (Next.js standalone server + Chromium f
 - **Build type:** Dockerfile (port `3000`).
 - **Environment variables:**
   - `DATABASE_URL`: the Postgres connection string (required)
-  - `PASSWORD`: the `/filter` admin password
+  - `ADMIN_PASSWORD`: the `/admin` moderation password (login is disabled while unset; the legacy `PASSWORD` is still accepted as a fallback)
+  - `ADMIN_SESSION_SECRET` (optional): secret for signing the 12h admin session cookie. Defaults to a key derived from the password
   - `CAPTURE_ORIGIN` (optional): where `/api/capture` loads `/capture` from. Defaults to the container itself.
   - `SKIP_MIGRATIONS=1` (optional): skip running migrations on start-up.
 - **On start-up** the container runs `prisma migrate deploy`, then starts the server.
