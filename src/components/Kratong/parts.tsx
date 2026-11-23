@@ -71,15 +71,19 @@ export function CandlePart({ part, selected, base, lit = true }: KratongNormalPa
 const FLOWER_RISE = 59;
 
 /** Flower on the base: bottom-centred, its top FLOWER_RISE units above the base top so it always reads clearly in front of the base's tips. */
+/** A flower is never wider than this share of its base (open cups use their own `flowerMax`). */
+const FLOWER_MAX = 0.92;
+
 export function FlowerPart({ part, base }: { part: KratongFlowerType; base: KratongBaseType }) {
-  const h = (part.fit * part.height) / part.width;
+  const w = Math.min(part.fit, base.width * (base.open?.flowerMax ?? FLOWER_MAX));
+  const h = (w * part.height) / part.width;
   // open bowl: the flower stands on the bowl's surface; otherwise its top rises FLOWER_RISE above the base top
   const bottom = base.open ? base.open.surface - 6 : Math.max(0, base.height + FLOWER_RISE - h);
   return (
     <img
       draggable={false}
       className="absolute left-1/2 max-w-none -translate-x-1/2 select-none"
-      style={{ width: unit(part.fit), bottom: unit(bottom) }}
+      style={{ width: unit(w), bottom: unit(bottom) }}
       src={part.url}
       alt={part.name}
     />

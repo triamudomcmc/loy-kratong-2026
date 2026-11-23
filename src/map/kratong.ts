@@ -39,7 +39,7 @@ export type KratongBaseType = KratongType & {
    * Open container (the ice bowl): drawn *behind* the flower and candle, which stand on its top surface instead of
    * being tucked behind front petals. `surface` = units above the base bottom where they sit.
    */
-  open?: { surface: number };
+  open?: { surface: number; flowerMax?: number };
 };
 
 /** New SVG flower: `width`/`height` natural size, `fit` = rendered width in the 341-unit kratong box. */
@@ -150,6 +150,8 @@ export const KratongMap: KratongMapType = {
       thumbnail: "/assets/kratong-v2/bases/pink-lotus.svg",
       width: 305,
       height: 159,
+      // lotus cup: flowers sit in its heart, in front of the back petals
+      open: { surface: 74, flowerMax: 0.78 },
     },
     "orange-lotus": {
       id: "orange-lotus",
@@ -160,6 +162,7 @@ export const KratongMap: KratongMapType = {
       thumbnail: "/assets/kratong-v2/bases/orange-lotus.svg",
       width: 324,
       height: 139,
+      open: { surface: 66, flowerMax: 0.8 },
     },
   },
   decorations: {
