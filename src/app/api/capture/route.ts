@@ -8,13 +8,16 @@ export async function GET(req: NextRequest) {
   const data = req.nextUrl.searchParams.get("data");
   if (!data) return new Response("Missing data", { status: 400 });
 
+  // Only "day" and "night" exist; anything else is the default day style.
+  const style = req.nextUrl.searchParams.get("style") === "night" ? "night" : "day";
+
   try {
     // In production render the capture page through the server itself (behind a proxy the public origin may not be
     // reachable from inside the container); CAPTURE_ORIGIN overrides it.
     const origin =
       process.env.CAPTURE_ORIGIN ||
       (process.env.NODE_ENV === "production" ? `http://127.0.0.1:${process.env.PORT || 3000}` : req.nextUrl.origin);
-    const file = await screenshot(`${origin}/capture?data=${encodeURIComponent(data)}`, 1080, 1920);
+    const file = await screenshot(`${origin}/capture?data=${encodeURIComponent(data)}&style=${style}`, 1080, 1920);
 
     return new Response(new Uint8Array(file), {
       status: 200,

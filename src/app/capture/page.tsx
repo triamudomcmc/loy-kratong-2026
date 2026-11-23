@@ -31,6 +31,6 @@ export default async function CapturePage({
 }: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
-  const { data } = await searchParams;
-  return <CaptureKratong data={parseData(data)} />;
+  const { data, style } = await searchParams;
+  return <CaptureKratong data={parseData(data)} style={style === "night" ? "night" : "day"} />;
 }
