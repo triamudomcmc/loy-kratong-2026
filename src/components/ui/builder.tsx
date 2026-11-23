@@ -12,7 +12,9 @@ import { GlassBackdrop, GlassSheet, StageFrame } from "./glass";
  */
 
 const A = "/assets/figma/create";
-const FOCUS = "outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#2256a3]/60";
+/** Scene 19 / 20 accent (tab pill, "ถัดไป", inactive tab text). */
+const PRIMARY = "#004b64";
+const FOCUS = "outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#004b64]/60";
 const SHADOW_FILTER = `drop-shadow(0 ${u(1)} ${u(2.5)} rgba(0,0,0,0.2))`;
 
 /**
@@ -23,7 +25,7 @@ const SHADOW_FILTER = `drop-shadow(0 ${u(1)} ${u(2.5)} rgba(0,0,0,0.2))`;
 export function BuilderShell({ nav = true, children }: { nav?: boolean; children: ReactNode }) {
   return (
     <MotionConfig reducedMotion="user">
-      <main data-scene="builder" className="fixed inset-0 overflow-hidden font-ui" style={{ background: "var(--color-sky-bottom, #1d9fa6)" }}>
+      <main data-scene="builder" className="fixed inset-0 overflow-hidden font-ui" style={{ background: "var(--color-sky-bottom, #1286b1)" }}>
         <GlassBackdrop nav={nav} />
         <StageFrame>
           <AnimatePresence mode="wait">
@@ -44,12 +46,15 @@ export function BuilderStage({
   title,
   preview,
   previewKey,
+  shadowY = 194.88,
   children,
 }: {
   title: string;
   /** The live kratong renderer; centred above the shadow ellipse. */
   preview: ReactNode;
   previewKey?: string;
+  /** card y of the shadow ellipse (Scene 19: 198.31, Scene 20: 200.44) */
+  shadowY?: number;
   children?: ReactNode;
 }) {
   const pop = useAnimationControls();
@@ -81,12 +86,13 @@ export function BuilderStage({
           <h1 className="font-normal">{title}</h1>
         </Layer>
         {/* Shadow ellipse (soft-light blend must sit on the wrapper, not the <img>) */}
-        <Layer x={81} y={194.88} w={187} h={23.762} style={{ mixBlendMode: "soft-light" }}>
+        <Layer x={78} y={shadowY} w={187} h={23.762} style={{ mixBlendMode: "soft-light" }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img alt="" src={`${A}/shadow-ellipse.svg`} className="block size-full max-w-none" />
         </Layer>
-        {/* Kratong preview: figma art spans x 97-259, y 70-207. Bob (outer) + pop on change (inner). */}
-        <Layer x={97.43} y={70} w={161.8} h={137.4}>
+        {/* Kratong preview: the default base is 190.8 wide with its bottom at card y 213.4 (Figma 188:1808);
+            the box is 341 x 400 units, so it is 190.8 x 223.6 here. Bob (outer) + pop on change (inner). */}
+        <Layer x={76.1} y={-10.2} w={190.8} h={223.6}>
           <motion.div
             className="size-full"
             animate={{ y: [0, -4, 0] }}
@@ -95,7 +101,7 @@ export function BuilderStage({
             <motion.div
               animate={pop}
               className="flex size-full items-start justify-center"
-              style={{ transformOrigin: "50% 85%" }}
+              style={{ transformOrigin: "50% 95%" }}
             >
               {preview}
             </motion.div>
@@ -152,8 +158,8 @@ function FadingGlassCard({ children }: { children: ReactNode }) {
 }
 
 /** Glass sheet (with tab strip when `tabs`), card-relative. */
-export function BuilderSheet({ header = true }: { header?: boolean }) {
-  return <GlassSheet header={header} />;
+export function BuilderSheet({ header = true, dim = 1 }: { header?: boolean; dim?: number }) {
+  return <GlassSheet header={header} dim={dim} />;
 }
 
 export interface TabItem<T extends string = string> {
@@ -193,13 +199,13 @@ export function TabStrip<T extends string>({
               <motion.span
                 layoutId={pillId}
                 className="absolute inset-0"
-                style={{ borderRadius: u(18), background: "var(--color-primary, #2256a3)" }}
+                style={{ borderRadius: u(18), background: PRIMARY }}
                 transition={{ type: "spring", stiffness: 420, damping: 34 }}
               />
             )}
             <motion.span
               className="relative"
-              animate={{ color: active ? "#ffffff" : "#2256a3" }}
+              animate={{ color: active ? "#ffffff" : PRIMARY }}
               transition={{ duration: 0.2 }}
             >
               {t.label}
@@ -455,7 +461,7 @@ export function NextButton({ onClick }: { onClick: () => void }) {
         borderRadius: u(51),
         fontSize: u(16),
         lineHeight: "normal",
-        background: "var(--color-primary, #2256a3)",
+        background: PRIMARY,
         filter: SHADOW_FILTER,
       }}
     >
@@ -524,7 +530,7 @@ export function ActionButtons({
             padding: u(10),
             borderRadius: u(51),
             background: "#fff",
-            color: "var(--color-primary, #2256a3)",
+            color: "#2256a3",
             fontSize: u(16),
             lineHeight: "normal",
             filter: SHADOW_FILTER,
@@ -538,7 +544,7 @@ export function ActionButtons({
                   width: u(14),
                   height: u(14),
                   border: `${u(2)} solid rgba(34,86,163,0.3)`,
-                  borderTopColor: "var(--color-primary, #2256a3)",
+                  borderTopColor: "#2256a3",
                 }}
               />
               กำลังโหลด

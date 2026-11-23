@@ -50,7 +50,7 @@ const toTile = (data: AnyPart, signVariant: number): Tile => ({
 });
 
 const PreviewKratong: FC<{ selected: Selected }> = ({ selected }) => (
-  <Kratong zIndex={7} height={u(117)} selected={selected} />
+  <Kratong zIndex={7} height={u(190.8)} selected={selected} />
 );
 
 interface CreateKratongProps {
@@ -71,7 +71,7 @@ const CreateKratong: FC<CreateKratongProps> = ({ selected, setSelected, nextPage
   const others = decorations.filter((d) => d.type !== "variant");
 
   return (
-    <BuilderStage title="สร้างกระทง" preview={<PreviewKratong selected={selected} />} previewKey={JSON.stringify(selected)}>
+    <BuilderStage title="สร้างกระทง" shadowY={198.31} preview={<PreviewKratong selected={selected} />} previewKey={JSON.stringify(selected)}>
       <BuilderSheet />
       <TabStrip tabs={TABS} value={section} onChange={setSection} />
       <ScrollArea key={section}>
@@ -166,8 +166,8 @@ const CreateWish: FC<CreateWishProps> = ({ selected, wish, setWish, prevPage }) 
   };
 
   return (
-    <BuilderStage title="ใส่คำอธิษฐาน" preview={<PreviewKratong selected={selected} />} previewKey={JSON.stringify(selected)}>
-      <BuilderSheet header={false} />
+    <BuilderStage title="ใส่คำอธิษฐาน" shadowY={200.44} preview={<PreviewKratong selected={selected} />} previewKey={JSON.stringify(selected)}>
+      <BuilderSheet header={false} dim={0.68} />
       <WishField
         label="ชื่อ"
         top={321}
@@ -219,7 +219,7 @@ export const Create: FC<{ idata?: KratongData | null }> = ({ idata }) => {
             flowers: DEFAULT_FLOWER,
             candles: "candle-yellow",
             decorations: "none",
-            signVariant: 0,
+            signVariant: 4,
           },
           wish: {
             name: "",

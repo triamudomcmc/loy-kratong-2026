@@ -87,10 +87,10 @@ export function GlassCard({ x = 16, y = 72, w = 343, h = 703, radius = 23, class
 
 /**
  * Lower sheet inside a GlassCard (Figma 91:733, 343 x 443 at y=260 in the card): 0.5px white border,
- * blur 15. With `header`, adds the 56px frosted strip at its top (91:751) that holds the tabs.
+ * blur 15. `dim` scales the tint/border alpha (Scene 20's sheet is 68%, baked in so the blur is kept). With `header`, adds the 56px frosted strip at its top (91:751) that holds the tabs.
  * Coordinates of children are card-relative, so absolute-position them in the card, not in the sheet.
  */
-export function GlassSheet({ y = 260, w = 343, h = 443, header = true }: { y?: number; w?: number; h?: number; header?: boolean }) {
+export function GlassSheet({ y = 260, w = 343, h = 443, header = true, dim = 1 }: { y?: number; w?: number; h?: number; header?: boolean; dim?: number }) {
   return (
     <>
       <Layer
@@ -100,8 +100,8 @@ export function GlassSheet({ y = 260, w = 343, h = 443, header = true }: { y?: n
         h={h}
         style={{
           borderRadius: u(23),
-          border: `${u(0.5)} solid #fff`,
-          backgroundImage: "linear-gradient(239.6683deg, rgba(255,255,255,0.6) 2.9073%, rgba(255,254,254,0.1) 102.06%)",
+          border: `${u(0.5)} solid rgba(255,255,255,${dim})`,
+          backgroundImage: `linear-gradient(239.6683deg, rgba(255,255,255,${0.6 * dim}) 2.9073%, rgba(255,254,254,${0.1 * dim}) 102.06%)`,
           backdropFilter: `blur(${u(15)})`,
           WebkitBackdropFilter: `blur(${u(15)})`,
         }}
