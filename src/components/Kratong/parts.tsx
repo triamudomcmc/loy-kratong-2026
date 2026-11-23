@@ -49,8 +49,11 @@ const CANDLE_BBOX_BOTTOM = (CANDLE_H * (2400 - 1394)) / 2400; // transparent str
 /** Flame region of the 2048x2400 candle PNG (all colours share it); removed from the image when the candle is unlit. */
 const NO_FLAME = "polygon(evenodd, 0 0, 100% 0, 100% 100%, 0 100%, 0 0, 44.9% 12.5%, 55.7% 12.5%, 55.7% 27.4%, 44.9% 27.4%, 44.9% 12.5%)";
 
+/** Every candle stands this many units higher than the base rule above. */
+const CANDLE_RAISE = 10;
+
 export function CandlePart({ part, selected, base, lit = true }: KratongNormalPartProps & { base: KratongBaseType; lit?: boolean }) {
-  const lift = base.open ? base.open.surface : base.height * (base.candleLift ?? 0.5);
+  const lift = (base.open ? base.open.surface : base.height * (base.candleLift ?? 0.5)) + CANDLE_RAISE;
   return (
     <img
       draggable={false}
