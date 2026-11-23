@@ -1,5 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
-import type { KratongBaseType, KratongFlowerType, KratongNormalPartType, KratongVariantPartType } from "@map/kratong";
+import { FLOWER_TUNE } from "@map/kratong";
+import type { BaseId, FlowerId, KratongBaseType, KratongFlowerType, KratongNormalPartType, KratongVariantPartType } from "@map/kratong";
 
 interface KratongNormalPartProps {
   part: KratongNormalPartType;
@@ -75,10 +76,11 @@ const FLOWER_RISE = 59;
 const FLOWER_MAX = 0.92;
 
 export function FlowerPart({ part, base }: { part: KratongFlowerType; base: KratongBaseType }) {
-  const w = Math.min(part.fit, base.width * (base.open?.flowerMax ?? FLOWER_MAX));
+  const tune = FLOWER_TUNE[base.id as BaseId]?.[part.id as FlowerId];
+  const w = Math.min(part.fit, base.width * (base.open?.flowerMax ?? FLOWER_MAX)) * (tune?.scale ?? 1);
   const h = (w * part.height) / part.width;
   // open bowl: the flower stands on the bowl's surface; otherwise its top rises FLOWER_RISE above the base top
-  const bottom = base.open ? base.open.surface - 6 : Math.max(0, base.height + FLOWER_RISE - h);
+  const bottom = (base.open ? base.open.surface - 6 : Math.max(0, base.height + FLOWER_RISE - h)) + (tune?.dy ?? 0);
   return (
     <img
       draggable={false}

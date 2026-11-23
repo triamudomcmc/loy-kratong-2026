@@ -39,7 +39,8 @@ export function Kratong({ selected, height, zIndex, className, lit = true }: Kra
           ),
         )}
       </div>
-      <div className={kratongCls.flower}>
+      {/* the candle always sits between base and flower: closed bases flower < candle < base, open bases base < candle < flower */}
+      <div className={base.open ? kratongCls.flowerOver : kratongCls.flower}>
         {flower && <FlowerPart part={flower} base={base} />}
       </div>
       <div className={kratongCls.candle}>

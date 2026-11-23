@@ -107,6 +107,33 @@ export const LEGACY_FLOWER: Record<string, FlowerId> = {
   "summer-fruits": "frangipani",
 };
 
+/**
+ * Per-combination flower tweaks, on top of the general placement rules (see Kratong/parts.tsx FlowerPart).
+ * `dy` = units up (negative = down), `scale` = width multiplier. Numbers match the combination sheet
+ * (base row x 5 + flower position, in KratongMap order).
+ */
+export const FLOWER_TUNE: Partial<Record<BaseId, Partial<Record<FlowerId, { dy?: number; scale?: number }>>>> = {
+  "green-lotus-large": {
+    "pink-lotus": { dy: -16 }, // #2
+    "pink-blossom": { dy: -16 }, // #3
+    "purple-cream": { dy: 14 }, // #4
+  },
+  "green-lotus": {
+    "pink-lotus": { scale: 0.82, dy: -14 }, // #7
+    "pink-blossom": { scale: 0.82, dy: -14 }, // #8
+    "purple-cream": { scale: 0.88, dy: 10 }, // #9
+    frangipani: { scale: 0.82, dy: -6 }, // #10
+  },
+  "blue-bowl": {
+    "pink-blossom": { dy: -10 }, // #13
+    "purple-cream": { dy: -12 }, // #14
+  },
+  "orange-lotus": {
+    "pink-blossom": { dy: 16 }, // #23
+    frangipani: { dy: 16 }, // #25
+  },
+};
+
 export const KratongMap: KratongMapType = {
   base: {
     "green-lotus-large": {
@@ -162,7 +189,6 @@ export const KratongMap: KratongMapType = {
       thumbnail: "/assets/kratong-v2/bases/orange-lotus.svg",
       width: 324,
       height: 139,
-      open: { surface: 66, flowerMax: 0.8 },
     },
   },
   decorations: {
