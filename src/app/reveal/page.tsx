@@ -1,5 +1,5 @@
-import { CaptureKratong } from "@components/Capture";
-import { RevealContinue } from "./reveal-continue";
+import { redirect } from "next/navigation";
+import { Reveal } from "@components/Reveal";
 import type { AnyResultData } from "@types-app/kratong";
 
 /** Reads the just-submitted kratong from the URL (same shape as /capture?data=). Bad or missing data goes to the river. */
@@ -14,10 +14,7 @@ function parseData(raw: string | string[] | undefined): AnyResultData | null {
   return null;
 }
 
-/**
- * The moment after "ลอยกระทง !": a full-screen reveal of the user's kratong (dark scene, then their name and
- * "โอมเพี้ยง !", then the kratong lights up), before continuing to the river.
- */
+/** The moment after "ลอยกระทง !": the kratong lights up on the water, then on to the river. */
 export default async function RevealPage({
   searchParams,
 }: {
@@ -25,10 +22,6 @@ export default async function RevealPage({
 }) {
   const { data } = await searchParams;
   const parsed = parseData(data);
-  return (
-    <main className="fixed inset-0 overflow-hidden bg-[#1286b1]">
-      {parsed && <CaptureKratong data={parsed} style="day" animate />}
-      <RevealContinue skip={!parsed} />
-    </main>
-  );
+  if (!parsed) redirect("/loykratong");
+  return <Reveal data={parsed} />;
 }
