@@ -8,10 +8,9 @@ import { u } from "@components/ui";
 /**
  * One-shot reveal for /capture?animate=1 (the Snap modal preview). Every wrapper renders its children untouched when
  * `animate` is false, so the screenshot route (/api/capture) stays the static final image. Timeline (seconds):
- *   0       scene dimmed, user's kratong dark, name and caption hidden
- *   0.4-1.6 scene brightens, kratong lights up (brightness 0.35 -> 1), glow blooms and breathes once
- *   1.6-2.4 name fades and rises in with a soft white glow
- *   2.2-3.2 caption glows in (blur 6px -> 0) with a brief brighter glow that settles
+ *   0       scene under a dark shade, user's kratong dark, name and caption hidden
+ *   0.4-1.4 name and caption glow in together, bright over the dark scene
+ *   1.6-2.8 shade lifts, kratong lights up (brightness 0.35 -> 1); glow blooms and breathes once (to 4.0)
  * Reduced motion: short plain fades. Nothing here touches backdrop-filter (the capture has none).
  */
 type P = { animate?: boolean; children: ReactNode };
@@ -36,22 +35,22 @@ export const RevealScene: FC<P & { className?: string; style?: CSSProperties }> 
 }) => {
   const reduce = useReducedMotion();
   const loaded = useLoaded();
-  if (!animate)
-    return (
-      <div className={className} style={style}>
-        {children}
-      </div>
-    );
   return (
-    <motion.div
-      className={className}
-      style={style}
-      initial={{ filter: reduce ? "brightness(1)" : "brightness(0.45)" }}
-      animate={loaded ? { filter: "brightness(1)" } : undefined}
-      transition={reduce ? { duration: 0.01 } : { duration: 1.2, delay: 0.4, ease: "easeInOut" }}
-    >
+    <div className={className} style={style}>
       {children}
-    </motion.div>
+      {/* The scene is darkened by a shade *under* the texts (z 60), so the words appear bright over the dark scene;
+          it lifts when the kratong lights up. */}
+      {animate && (
+        <motion.div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 bg-black"
+          style={{ zIndex: 55 }}
+          initial={{ opacity: reduce ? 0 : 0.55 }}
+          animate={loaded ? { opacity: 0 } : undefined}
+          transition={reduce ? { duration: 0.01 } : { duration: 1.2, delay: 1.6, ease: "easeInOut" }}
+        />
+      )}
+    </div>
   );
 };
 
@@ -70,7 +69,7 @@ export const RevealKratong: FC<P & { style: CSSProperties }> = ({ animate, child
       style={style}
       initial={{ filter: reduce ? "brightness(1)" : "brightness(0.35)" }}
       animate={loaded ? { filter: "brightness(1)" } : undefined}
-      transition={reduce ? { duration: 0.01 } : { duration: 1.2, delay: 0.4, ease: "easeInOut" }}
+      transition={reduce ? { duration: 0.01 } : { duration: 1.2, delay: 1.6, ease: "easeInOut" }}
     >
       {children}
     </motion.div>
@@ -91,8 +90,8 @@ export const RevealGlow: FC<P> = ({ animate, children }) => {
       }
       transition={
         reduce
-          ? { duration: 0.4, delay: 0.4 }
-          : { duration: 2.4, delay: 0.4, times: [0, 0.4, 0.7, 1], ease: "easeInOut" }
+          ? { duration: 0.4, delay: 1.6 }
+          : { duration: 2.4, delay: 1.6, times: [0, 0.4, 0.7, 1], ease: "easeInOut" }
       }
     >
       {children}
@@ -123,7 +122,7 @@ export const RevealName: FC<P> = ({ animate, children }) => {
             }
           : undefined
       }
-      transition={reduce ? { duration: 0.3, delay: 1.6 } : { duration: 0.8, delay: 1.6, ease: EASE }}
+      transition={reduce ? { duration: 0.3, delay: 0.4 } : { duration: 0.8, delay: 0.4, ease: EASE }}
     >
       {children}
     </motion.div>
@@ -157,10 +156,10 @@ export const RevealCaption: FC<P> = ({ animate, children }) => {
       // fade in, fade out and pop back, so it looked like it glowed twice)
       transition={
         reduce
-          ? { duration: 0.3, delay: 2.2 }
+          ? { duration: 0.3, delay: 0.4 }
           : {
-              opacity: { duration: 0.5, delay: 2.2, ease: "easeOut" },
-              filter: { duration: 1.0, delay: 2.2, times: [0, 0.55, 1], ease: "easeOut" },
+              opacity: { duration: 0.5, delay: 0.4, ease: "easeOut" },
+              filter: { duration: 1.0, delay: 0.4, times: [0, 0.55, 1], ease: "easeOut" },
             }
       }
     >
