@@ -133,7 +133,20 @@ const textGlow = (a: number) =>
   `drop-shadow(0 0 ${6 * a}px rgba(255,255,255,${0.9 * a})) drop-shadow(0 0 ${22 * a}px rgba(255,255,255,${0.55 * a}))`;
 
 /** One headline line: hidden at first, glows in (bright white + soft glow + small rise), then settles to a gentle glow. */
-function GlowLine({ y, fontSize, reduce, children }: { y: number; fontSize: number; reduce: boolean | null; children: string }) {
+function GlowLine({
+  y,
+  fontSize,
+  reduce,
+  lines = 1,
+  children,
+}: {
+  y: number;
+  fontSize: number;
+  reduce: boolean | null;
+  /** >1: wrap onto up to this many lines, ending in an ellipsis (the wish) */
+  lines?: number;
+  children: string;
+}) {
   const style: CSSProperties = {
     position: "absolute",
     left: u(187.5),
@@ -141,12 +154,20 @@ function GlowLine({ y, fontSize, reduce, children }: { y: number; fontSize: numb
     width: u(320),
     marginLeft: u(-160),
     fontSize: u(fontSize),
-    lineHeight: "normal",
-    whiteSpace: "nowrap",
+    lineHeight: lines > 1 ? 1.35 : "normal",
     overflow: "hidden",
-    textOverflow: "ellipsis",
     textAlign: "center",
-    padding: `0 0 ${u(6)}`,
+    // multi-line: no bottom padding and an exact height, so marks of the next (hidden) line never peek out
+    padding: lines > 1 ? 0 : `0 0 ${u(6)}`,
+    ...(lines > 1
+      ? {
+          display: "-webkit-box",
+          WebkitLineClamp: lines,
+          WebkitBoxOrient: "vertical",
+          overflowWrap: "anywhere",
+          maxHeight: `${lines * 1.35}em`,
+        }
+      : { whiteSpace: "nowrap", textOverflow: "ellipsis" }),
   };
   return (
     <motion.div
@@ -174,6 +195,8 @@ export function Reveal({ data }: { data: AnyResultData }) {
   const { leaving, go } = useContinue(reduce ? 150 : 550);
   const [lit, setLit] = useState(false);
   const name = data.wish?.name?.trim() ?? "";
+  // the wish replaces "โอมเพี้ยง !" (kept as the fallback when there is no wish text)
+  const wish = data.wish?.content?.trim() ?? "";
 
   useEffect(() => {
     const t = window.setTimeout(() => setLit(true), (reduce ? 0.7 : LIGHT_AT) * 1000);
@@ -295,9 +318,15 @@ export function Reveal({ data }: { data: AnyResultData }) {
           <GlowLine y={205} fontSize={26} reduce={reduce}>
             {name}
           </GlowLine>
-          <GlowLine y={243} fontSize={46} reduce={reduce}>
-            {CAPTION}
-          </GlowLine>
+          {wish ? (
+            <GlowLine y={246} fontSize={24} lines={4} reduce={reduce}>
+              {wish}
+            </GlowLine>
+          ) : (
+            <GlowLine y={243} fontSize={46} reduce={reduce}>
+              {CAPTION}
+            </GlowLine>
+          )}
           <div className="lg:hidden">
             <NavHeader />
           </div>
