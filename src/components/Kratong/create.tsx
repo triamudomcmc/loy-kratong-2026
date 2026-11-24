@@ -162,7 +162,8 @@ const CreateWish: FC<CreateWishProps> = ({ selected, wish, setWish, prevPage }) 
     const id = kratongData.data.id;
     localStorage.setItem("entityId", id);
     localStorage.setItem("entity", JSON.stringify(entityData));
-    router.push("/loykratong");
+    // play the reveal of the new kratong first; /reveal continues to /loykratong on its own
+    router.push(`/reveal?data=${encodeURIComponent(JSON.stringify(entityData))}`);
   };
 
   return (

@@ -264,7 +264,12 @@ export const CaptureKratong: FC<{ data: AnyResultData; style?: CaptureStyle; ani
           </Layer>
         )}
 
-        <div className="absolute inset-0" style={{ zIndex: 60 }}>
+        {/* On screens narrower than the 431-wide design (the /reveal page on phones) the sides are cropped:
+            shift the logo in by the cropped amount so it stays fully visible. No effect on the 1080x1920 capture. */}
+        <div
+          className="absolute inset-0"
+          style={{ zIndex: 60, left: `max(0px, calc((${u(431)} - 100vw) / 2))` }}
+        >
           <NavHeader />
         </div>
         <Layer x={85} y={718} w={272} h={32} className="text-center text-white" style={{ zIndex: 60 }}>

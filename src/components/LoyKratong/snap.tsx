@@ -1,7 +1,7 @@
 "use client";
 
 import type { FC } from "react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { motion } from "motion/react";
 import { Frame, Layer, u } from "@components/ui";
 import type { ResultData } from "@types-app/kratong";
@@ -10,14 +10,6 @@ export type CaptureStyle = "day" | "night";
 
 export const captureUrl = (entity: ResultData, style: CaptureStyle = "day") =>
   `/api/capture?data=${encodeURIComponent(JSON.stringify(entity))}&style=${style}`;
-
-/** Animated preview: the same page as the share image, played as a one-shot reveal. */
-const previewUrl = (entity: ResultData, style: CaptureStyle) =>
-  `/capture?animate=1&style=${style}&data=${encodeURIComponent(JSON.stringify(entity))}`;
-
-/** /capture is designed at 431x812 (--u = 100vh / 812). */
-const CAPTURE_W = 431;
-const CAPTURE_H = 812;
 
 const STYLES: { id: CaptureStyle; label: string }[] = [
   { id: "day", label: "กลางวัน" },
@@ -52,19 +44,6 @@ export const SnapModal: FC<{ entity: ResultData; onClose: () => void }> = ({ ent
   const [saving, setSaving] = useState(false);
   const [failed, setFailed] = useState(false);
   const [retry, setRetry] = useState(0);
-  const boxRef = useRef<HTMLDivElement>(null);
-  const [scale, setScale] = useState(0);
-
-  // Fit the 431x812 iframe to the preview box (cover, like the old <img>).
-  useEffect(() => {
-    const el = boxRef.current;
-    if (!el) return;
-    const fit = () => setScale(Math.max(el.clientWidth / CAPTURE_W, el.clientHeight / CAPTURE_H));
-    fit();
-    const ro = new ResizeObserver(fit);
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, []);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
@@ -224,29 +203,16 @@ export const SnapModal: FC<{ entity: ResultData; onClose: () => void }> = ({ ent
                 backgroundImage: "linear-gradient(183.82deg, var(--color-sky-top) 1.5%, var(--color-sky-bottom) 52.76%)",
               }}
             >
-              <div ref={boxRef} className="absolute inset-0 overflow-hidden">
-                <iframe
-                  key={`${style}#${retry}`}
-                  title="ภาพกระทง"
-                  aria-hidden="true"
-                  tabIndex={-1}
-                  loading="eager"
-                  scrolling="no"
-                  src={retry ? `${previewUrl(entity, style)}&r=${retry}` : previewUrl(entity, style)}
-                  className="absolute left-1/2 top-1/2 block border-0 transition-opacity duration-300"
-                  style={{
-                    width: CAPTURE_W,
-                    height: CAPTURE_H,
-                    maxWidth: "none",
-                    transform: `translate(-50%, -50%) scale(${scale || 0.0001})`,
-                    transformOrigin: "center",
-                    pointerEvents: "none",
-                    opacity: state === "ready" && scale ? 1 : 0,
-                  }}
-                  onLoad={() => setState("ready")}
-                  onError={() => setState("error")}
-                />
-              </div>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                key={`${imgUrl}#${retry}`}
+                alt="ภาพกระทง"
+                src={retry ? `${imgUrl}&r=${retry}` : imgUrl}
+                className="absolute inset-0 size-full max-w-none object-cover transition-opacity duration-500"
+                style={{ opacity: state === "ready" ? 1 : 0 }}
+                onLoad={() => setState("ready")}
+                onError={() => setState("error")}
+              />
               {state !== "ready" && (
                 <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-white font-ui" style={{ fontSize: u(15) }}>
                   {state === "loading" ? (
