@@ -231,6 +231,18 @@ export const CaptureKratong: FC<{ data: AnyResultData; style?: CaptureStyle }> =
         <Standing selected={RIGHT} cx={417.6} bottom={702.5} size={239} z={3} lit={false} />
         <Standing selected={data.kratong} cx={215.5} bottom={583} size={300.3} z={5} lit={false} />
 
+        {/* the user's name under their kratong (Snap frame 196:2664 position), in the caption's display font */}
+        {data.wish?.name?.trim() && (
+          <Layer x={70.5} y={592} w={290} h={40} className="text-center text-white" style={{ zIndex: 60 }}>
+            <p
+              className="font-display overflow-hidden text-ellipsis"
+              style={{ fontSize: u(28), lineHeight: "normal", whiteSpace: "nowrap" }}
+            >
+              {data.wish.name.trim()}
+            </p>
+          </Layer>
+        )}
+
         <div className="absolute inset-0" style={{ zIndex: 60 }}>
           <NavHeader />
         </div>
