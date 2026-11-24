@@ -28,8 +28,11 @@ model Kratong {
   status      KratongStatus @default(PENDING)
   sourceId    String?       @unique // invite id for PRINCIPAL/CUPSAA; dedupes sendData retries
   createdAt   DateTime      @default(now())
+  pinned      Boolean       @default(false) // admin-pinned: always on the river, locked against hide/delete
+  pinnedAt    DateTime?
 
   @@index([status, createdAt])
+  @@index([pinned, status])
 }
 
 model SpecialKratong {

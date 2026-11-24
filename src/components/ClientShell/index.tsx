@@ -30,7 +30,7 @@ export function ClientShell({ children }: { children: React.ReactNode }) {
         <source src="/assets/audio/music.mp3"></source>
       </audio>
       {children}
-      {pathname !== "/capture" && (
+      {pathname !== "/capture" && !pathname.startsWith("/admin") && (
         <div className="fixed bottom-0 w-screen z-[99]">
           <div
             className="absolute text-center right-6 bottom-4 cursor-pointer w-[36px] h-[36px]"

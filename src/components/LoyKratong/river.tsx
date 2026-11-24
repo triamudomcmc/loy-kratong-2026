@@ -42,20 +42,13 @@ interface Runtime {
   popup: HTMLElement | null;
 }
 
-function shuffle<T>(input: T[]): T[] {
-  const a = [...input];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
-
 const isEntity = (d: unknown): d is ResultData =>
   !!d && typeof d === "object" && "kratong" in d && "wish" in d && !!(d as ResultData).kratong && !!(d as ResultData).wish;
 
 function buildItems(entities: ResultData[], own: ResultData | null): Item[] {
-  const shuffled = shuffle(entities.filter((e) => kindOf(e) !== null)); // principal / CUPSAA rows are no longer shown
+  // principal / CUPSAA rows are no longer shown. Order is kept: the server returns pinned kratongs first, then
+  // random ones, and dealing round-robin spreads the pinned ones across the three lanes.
+  const shuffled = entities.filter((e) => kindOf(e) !== null);
   const back: ResultData[] = [];
   const mid: ResultData[] = [];
   const front: ResultData[] = [];

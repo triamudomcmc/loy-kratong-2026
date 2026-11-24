@@ -29,6 +29,9 @@ Invite records for `/create?id=`, `/principal?id=`, `/CUPSAA?id=` live in the `S
 | `/admin` | Moderation dashboard (password; `/filter` redirects here) |
 | `/capture`, `/api/capture` | 1080×1920 share image |
 
+### Pinning kratongs (ปักหมุด)
+To put an executive's kratong on the river for good: submit it through `/create`, then open `/admin`, find it and press **ปักหมุด** (the ปักหมุด tab lists all pinned ones). Pinning also approves it. Every pinned kratong (up to 10, newest pin first) appears on the river on every visit, alongside a few random others. Pinned kratongs are locked: hide, back-to-pending and delete are refused (in the UI and on the server) until you press **เลิกปักหมุด**. Name, wish and parts can still be fixed with **แก้ไข**. The `add_pinned` migration runs automatically on deploy (`prisma migrate deploy` at container start).
+
 See `MIGRATION_NOTES.md` for the 2021 → 2026 upgrade details.
 
 ## Deploy (Docker / Dokploy)
