@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 import type { CSSProperties, FC, ReactNode } from "react";
 import { Kratong } from "@components/Kratong/kratong";
+import { RevealCaption, RevealGlow, RevealKratong, RevealName, RevealScene } from "./reveal";
 import { Layer, Moon, NavHeader, TealSky, u } from "@components/ui";
 import type { AnyResultData, KratongSelected } from "@types-app/kratong";
 
@@ -17,7 +18,9 @@ const Bleed = ({ inset, src }: { inset: string; src: string }) => (
   </div>
 );
 
-const Img = ({ src }: { src: string }) => <img alt="" className="absolute block inset-0 size-full max-w-none" src={src} />;
+const Img = ({ src }: { src: string }) => (
+  <img alt="" className="absolute block inset-0 size-full max-w-none" src={src} />
+);
 
 /** A fireworks piece: box (x,y,w,h) holding an inner image of iw x ih, optionally rotated / flipped. */
 const FwPart = ({
@@ -73,7 +76,12 @@ const FireworkA = () => (
 const FireworkB = () => (
   <>
     <FwPart src={`${A}/fw-b-0.svg`} box={[195.44, 201.5, 26.528, 29.722]} />
-    <FwPart src={`${A}/fw-b-1.svg`} box={[145.84, 152.97, 156.284, 157.737]} inner={[132.502, 130.587]} rotate={77.44} />
+    <FwPart
+      src={`${A}/fw-b-1.svg`}
+      box={[145.84, 152.97, 156.284, 157.737]}
+      inner={[132.502, 130.587]}
+      rotate={77.44}
+    />
     <FwPart
       src={`${A}/fw-b-2.svg`}
       box={[228.67, 224.46, 33.901, 30.014]}
@@ -101,15 +109,16 @@ const RIGHT = mk("blue-bowl", "candle-yellow", "none", "none");
  * A kratong standing on the water with its mirror ghost underneath.
  * `cx` = horizontal centre, `bottom` = the base's bottom edge y, `size` = renderer width (--size).
  */
-const Standing: FC<{ selected: KratongSelected; cx: number; bottom: number; size: number; z: number; ghost?: boolean; lit?: boolean }> = ({
-  selected,
-  cx,
-  bottom,
-  size,
-  z,
-  ghost = true,
-  lit = true,
-}) => {
+const Standing: FC<{
+  selected: KratongSelected;
+  cx: number;
+  bottom: number;
+  size: number;
+  z: number;
+  ghost?: boolean;
+  lit?: boolean;
+  reveal?: boolean;
+}> = ({ selected, cx, bottom, size, z, ghost = true, lit = true, reveal = false }) => {
   const h = (size * 2400) / 2048;
   return (
     <>
@@ -132,9 +141,10 @@ const Standing: FC<{ selected: KratongSelected; cx: number; bottom: number; size
           <Kratong selected={selected} height={u(size)} zIndex={1} lit={lit} />
         </div>
       )}
-      <div className="absolute" style={{ left: u(cx - size / 2), top: u(bottom - h), zIndex: z }}>
+      {/* `reveal`: the user's kratong lights up from dark in the animated preview (RevealKratong) */}
+      <RevealKratong animate={reveal} style={{ left: u(cx - size / 2), top: u(bottom - h), zIndex: z }}>
         <Kratong selected={selected} height={u(size)} zIndex={z} lit={lit} />
-      </div>
+      </RevealKratong>
     </>
   );
 };
@@ -166,12 +176,18 @@ const Multiply = ({ children, style }: { children: ReactNode; style?: CSSPropert
 /**
  * Share image (Figma หน้าบันทึกหน้าจอ, day 187:966 / night 200:2726, 431x812) screenshotted by /api/capture at
  * 1080x1920. `--u` = 100vh / 812, so the design fills the viewport height; the design box is centred and the sky,
- * water and skyline bleed sideways to fill the (slightly wider) viewport. Fully static: nothing animates.
+ * water and skyline bleed sideways to fill the (slightly wider) viewport. Static unless `animate` (the Snap preview
+ * iframe, /capture?animate=1) plays the one-shot reveal in ./reveal and holds on this same final state.
  */
-export const CaptureKratong: FC<{ data: AnyResultData; style?: CaptureStyle }> = ({ data, style = "day" }) => {
+export const CaptureKratong: FC<{ data: AnyResultData; style?: CaptureStyle; animate?: boolean }> = ({
+  data,
+  style = "day",
+  animate = false,
+}) => {
   const night = style === "night";
   return (
-    <div
+    <RevealScene
+      animate={animate}
       className="relative h-screen w-screen overflow-hidden"
       style={{ ["--u" as string]: "calc(100vh / 812)" } as CSSProperties}
     >
@@ -192,7 +208,9 @@ export const CaptureKratong: FC<{ data: AnyResultData; style?: CaptureStyle }> =
 
         {/* Ellipse 151: candle glow behind the user's kratong */}
         <Layer x={45} y={294} w={335} h={335}>
-          <Img src={`${A}/glow-day.svg`} />
+          <RevealGlow animate={animate}>
+            <Img src={`${A}/glow-day.svg`} />
+          </RevealGlow>
         </Layer>
 
         {/* clouds, opacity 13% */}
@@ -219,27 +237,30 @@ export const CaptureKratong: FC<{ data: AnyResultData; style?: CaptureStyle }> =
         {night && (
           /* Ellipse 152 (260:691): the cold glow behind the kratongs (normal blend) */
           <Layer x={49.669} y={294} w={335} h={335}>
-            <Img src={`${A}/night-glow.svg`} />
+            <RevealGlow animate={animate}>
+              <Img src={`${A}/night-glow.svg`} />
+            </RevealGlow>
           </Layer>
         )}
 
         <FireworkA />
         <FireworkB />
 
-
         <Standing selected={LEFT} cx={24.6} bottom={448} size={152.5} z={2} lit={false} />
         <Standing selected={RIGHT} cx={417.6} bottom={702.5} size={239} z={3} lit={false} />
-        <Standing selected={data.kratong} cx={215.5} bottom={583} size={300.3} z={5} lit={false} />
+        <Standing selected={data.kratong} cx={215.5} bottom={583} size={300.3} z={5} lit={false} reveal={animate} />
 
         {/* the user's name under their kratong (Snap frame 196:2664 position), in the caption's display font */}
         {data.wish?.name?.trim() && (
           <Layer x={70.5} y={592} w={290} h={40} className="text-center text-white" style={{ zIndex: 60 }}>
-            <p
-              className="font-display overflow-hidden text-ellipsis"
-              style={{ fontSize: u(28), lineHeight: "normal", whiteSpace: "nowrap" }}
-            >
-              {data.wish.name.trim()}
-            </p>
+            <RevealName animate={animate}>
+              <p
+                className="font-display overflow-hidden text-ellipsis"
+                style={{ fontSize: u(28), lineHeight: "normal", whiteSpace: "nowrap" }}
+              >
+                {data.wish.name.trim()}
+              </p>
+            </RevealName>
           </Layer>
         )}
 
@@ -247,14 +268,16 @@ export const CaptureKratong: FC<{ data: AnyResultData; style?: CaptureStyle }> =
           <NavHeader />
         </div>
         <Layer x={85} y={718} w={272} h={32} className="text-center text-white" style={{ zIndex: 60 }}>
-          <p className="font-display" style={{ fontSize: u(36), lineHeight: "normal", whiteSpace: "nowrap" }}>
-            {CAPTION}
-          </p>
+          <RevealCaption animate={animate}>
+            <p className="font-display" style={{ fontSize: u(36), lineHeight: "normal", whiteSpace: "nowrap" }}>
+              {CAPTION}
+            </p>
+          </RevealCaption>
         </Layer>
         <div className="absolute inset-0" style={{ zIndex: 60 }}>
           <Moon glow={{ x: 269, y: 50, size: 99 }} body={{ x: 269, y: 49, size: 101 }} />
         </div>
       </div>
-    </div>
+    </RevealScene>
   );
 };
