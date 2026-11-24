@@ -8,10 +8,7 @@ const A = "/assets/figma-v2/capture";
 
 export type CaptureStyle = "day" | "night";
 
-const COPY: Record<CaptureStyle, string> = {
-  day: "ว้าว กระทงของคุณเท่จัง !",
-  night: "หลับตาลง แล้วอธิษฐานสิ",
-};
+const CAPTION = "โอมเพี้ยง !";
 
 /** Figma-layer box with percent insets (negative insets bleed past the box). */
 const Bleed = ({ inset, src }: { inset: string; src: string }) => (
@@ -161,7 +158,7 @@ const Water = ({ night }: { night: boolean }) => {
 
 /** Wraps a layer so that it multiplies with everything painted before it (the SVGs' own blend mode is lost inside <img>). */
 const Multiply = ({ children, style }: { children: ReactNode; style?: CSSProperties }) => (
-  <div className="pointer-events-none absolute inset-0" style={{ mixBlendMode: "multiply", zIndex: 50, ...style }}>
+  <div className="pointer-events-none absolute inset-0" style={{ mixBlendMode: "multiply", ...style }}>
     {children}
   </div>
 );
@@ -193,6 +190,11 @@ export const CaptureKratong: FC<{ data: AnyResultData; style?: CaptureStyle }> =
           </div>
         </Layer>
 
+        {/* Ellipse 151: candle glow behind the user's kratong */}
+        <Layer x={45} y={294} w={335} h={335}>
+          <Img src={`${A}/glow-day.svg`} />
+        </Layer>
+
         {/* clouds, opacity 13% */}
         <Layer x={260} y={113} w={146.807} h={99.006} style={{ opacity: 0.13 }}>
           <Img src={`${A}/cloud-3.svg`} />
@@ -204,49 +206,42 @@ export const CaptureKratong: FC<{ data: AnyResultData; style?: CaptureStyle }> =
           <Img src={`${A}/cloud-6.svg`} />
         </Layer>
 
-        <FireworkA />
-        <FireworkB />
-
-        {/* candle glow behind the user's kratong */}
-        {!night && (
-          <Layer x={45} y={294} w={335} h={335}>
-            <Img src={`${A}/glow-day.svg`} />
-          </Layer>
-        )}
-
-        <Standing selected={LEFT} cx={24.6} bottom={448} size={152.5} z={2} lit={!night} />
-        <Standing selected={RIGHT} cx={417.6} bottom={702.5} size={239} z={3} lit={!night} />
-        <Standing selected={data.kratong} cx={215.5} bottom={583} size={300.3} z={5} lit={!night} />
-
         {night && (
           <Multiply>
-            {/* Vector 1144 (200:3596): the night shade, x -84 / y -1971 / 649x2811 (stretched sideways to cover the bleed) */}
+            {/* Vector 1144 (200:3596): the night shade, x -84 / y -1971 / 649x2811 (stretched sideways to cover the bleed).
+                It only darkens the sky, skyline and water: the fireworks, moon and every kratong sit above it. */}
             <Layer x={-84} y={-1971.06} w={649.155} h={2811.119} style={{ transform: "scaleX(1.12)" }}>
               <Img src={`${A}/night-shade.svg`} />
             </Layer>
           </Multiply>
         )}
 
+        {night && (
+          /* Ellipse 152 (260:691): the cold glow behind the kratongs (normal blend) */
+          <Layer x={49.669} y={294} w={335} h={335}>
+            <Img src={`${A}/night-glow.svg`} />
+          </Layer>
+        )}
+
+        <FireworkA />
+        <FireworkB />
+
+
+        <Standing selected={LEFT} cx={24.6} bottom={448} size={152.5} z={2} lit={false} />
+        <Standing selected={RIGHT} cx={417.6} bottom={702.5} size={239} z={3} lit={false} />
+        <Standing selected={data.kratong} cx={215.5} bottom={583} size={300.3} z={5} lit={false} />
+
         <div className="absolute inset-0" style={{ zIndex: 60 }}>
           <NavHeader />
         </div>
         <Layer x={85} y={718} w={272} h={32} className="text-center text-white" style={{ zIndex: 60 }}>
           <p className="font-display" style={{ fontSize: u(36), lineHeight: "normal", whiteSpace: "nowrap" }}>
-            {COPY[style]}
+            {CAPTION}
           </p>
         </Layer>
         <div className="absolute inset-0" style={{ zIndex: 60 }}>
           <Moon glow={{ x: 269, y: 50, size: 99 }} body={{ x: 269, y: 49, size: 101 }} />
         </div>
-
-        {night && (
-          <Multiply>
-            {/* Ellipse 152 (204:3899): a cold glow where the candles are dimmed */}
-            <Layer x={35.735} y={218.131} w={335} h={335}>
-              <Img src={`${A}/night-glow.svg`} />
-            </Layer>
-          </Multiply>
-        )}
       </div>
     </div>
   );

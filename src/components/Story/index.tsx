@@ -3,7 +3,7 @@
 import { useCallback, useRef, useState, type CSSProperties, type KeyboardEvent, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { Cloud, Logo, MobileScenery, MovingMoon, NavHeader, PillButton, Stage, TealSky, u, type MoonPose } from "@components/ui";
+import { Cloud, Layer, Logo, MobileScenery, MovingMoon, NavHeader, PillButton, Stage, TealSky, u, type MoonPose } from "@components/ui";
 import { Kratong } from "@components/Kratong/kratong";
 import type { KratongSelected } from "@types-app/kratong";
 
@@ -119,19 +119,38 @@ const sel = (base: string, flowers: string, candles: string): KratongSelected =>
 });
 
 /**
- * The kratongs floating on Scene 22's water: real parts rendered by <Kratong>, placed from the Figma groups
- * (centre 195:6463 98.8,665.8 178.6 wide; left 195:5911; right 195:6115). `size` = the base's design width x 341 / base width.
- * Bottom of each group = bottom of the kratong box.
+ * The kratongs floating on Scene 22's water: real parts rendered by <Kratong> (unlit), placed from the Figma groups
+ * (centre 195:6463 98.8,665.8 178.6 wide; left 195:5911 kratong 118.9 wide at -64.1,686.7). The right group (195:6115)
+ * sits off-canvas except for its ripple. `size` = the kratong's design width x 341 / base width; bottom = box bottom.
  */
 const FLOATERS: { sel: KratongSelected; left: number; bottom: number; size: number; z: number; bob: number; delay: number }[] = [
-  { sel: sel("green-lotus", "none", "candle-yellow"), left: -89.2, bottom: 808.5, size: 183.7, z: 1, bob: 2.2, delay: 0.4 },
-  { sel: sel("blue-bowl", "none", "candle-orange"), left: 343.3, bottom: 792.6, size: 197.8, z: 1, bob: 2, delay: 0.8 },
+  { sel: sel("green-lotus-large", "none", "candle-orange"), left: -64.1, bottom: 771.84, size: 118.94, z: 1, bob: 1.6, delay: 0.4 },
   { sel: sel("green-lotus-large", "none", "candle-orange"), left: 98.8, bottom: 791.7, size: 178.6, z: 2, bob: 2.6, delay: 0 },
 ];
+
+/** Static water details of the floating groups: left shadow (multiply) and the two ripples (195:5911 / 195:6115). */
+function Ripples() {
+  const img = (src: string, x: number, y: number, w: number, h: number, extra?: CSSProperties) => (
+    <Layer x={x} y={y} w={w} h={h} style={extra}>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img alt="" className="absolute block inset-0 size-full max-w-none" src={src} />
+    </Layer>
+  );
+  return (
+    <>
+      {img("/assets/figma-v2/scenery/ripple-left.svg", -87.78, 756.96, 181.034, 20.014)}
+      {img("/assets/figma-v2/scenery/ripple-right.svg", 351.73, 737.07, 181.034, 20.014)}
+      <div className="absolute inset-0" style={{ mixBlendMode: "multiply" }}>
+        {img("/assets/figma-v2/scenery/shadow-left.svg", -59.99, 751.21, 109.115, 57.273, { transform: "rotate(180deg)" })}
+      </div>
+    </>
+  );
+}
 
 function Floaters({ reduce }: { reduce: boolean | null }) {
   return (
     <>
+      <Ripples />
       {FLOATERS.map((f, i) => (
         <motion.div
           key={i}
@@ -140,7 +159,7 @@ function Floaters({ reduce }: { reduce: boolean | null }) {
           animate={reduce ? undefined : { y: [0, -f.bob, 0] }}
           transition={{ duration: 5 + i, repeat: Infinity, ease: "easeInOut", delay: f.delay }}
         >
-          <Kratong selected={f.sel} height={u(f.size)} zIndex={f.z} />
+          <Kratong selected={f.sel} height={u(f.size)} zIndex={f.z} lit={false} />
         </motion.div>
       ))}
     </>
