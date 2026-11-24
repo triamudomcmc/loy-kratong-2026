@@ -153,8 +153,15 @@ export const RevealCaption: FC<P> = ({ animate, children }) => {
             }
           : undefined
       }
+      // opacity is a single 0 -> 1 fade; only the 3-keyframe filter uses `times` (sharing them made the text
+      // fade in, fade out and pop back, so it looked like it glowed twice)
       transition={
-        reduce ? { duration: 0.3, delay: 2.2 } : { duration: 1.0, delay: 2.2, times: [0, 0.55, 1], ease: "easeOut" }
+        reduce
+          ? { duration: 0.3, delay: 2.2 }
+          : {
+              opacity: { duration: 0.5, delay: 2.2, ease: "easeOut" },
+              filter: { duration: 1.0, delay: 2.2, times: [0, 0.55, 1], ease: "easeOut" },
+            }
       }
     >
       {children}
